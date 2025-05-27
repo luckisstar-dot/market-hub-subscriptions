@@ -1,8 +1,9 @@
 
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
-import RoleShowcase from '@/components/RoleShowcase';
-import SubscriptionPlans from '@/components/SubscriptionPlans';
+import FeaturedProducts from '@/components/FeaturedProducts';
+import CategoryShowcase from '@/components/CategoryShowcase';
+import CallToAction from '@/components/CallToAction';
 import Footer from '@/components/Footer';
 
 const Index = () => {
@@ -14,8 +15,9 @@ const Index = () => {
     <div className="min-h-screen bg-white">
       <Header userRole={userRole} />
       <HeroSection />
-      <RoleShowcase />
-      <SubscriptionPlans />
+      <FeaturedProducts />
+      <CategoryShowcase />
+      <CallToAction />
       <Footer />
     </div>
   );
