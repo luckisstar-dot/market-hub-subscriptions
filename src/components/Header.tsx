@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -56,6 +57,19 @@ const Header = ({ userRole = null }: HeaderProps) => {
     }
   };
 
+  const getDashboardLink = () => {
+    switch (userRole) {
+      case 'vendor':
+        return '/vendor-dashboard';
+      case 'admin':
+        return '/admin-dashboard';
+      case 'buyer':
+        return '/buyer-dashboard';
+      default:
+        return '/';
+    }
+  };
+
   return (
     <header className="bg-white shadow-md border-b sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -63,9 +77,11 @@ const Header = ({ userRole = null }: HeaderProps) => {
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-marketplace-primary to-marketplace-secondary bg-clip-text text-transparent">
-                MarketPlace
-              </h1>
+              <Link to="/">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-marketplace-primary to-marketplace-secondary bg-clip-text text-transparent">
+                  MarketPlace
+                </h1>
+              </Link>
             </div>
           </div>
 
@@ -117,9 +133,11 @@ const Header = ({ userRole = null }: HeaderProps) => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuItem>
-                      <User className="mr-2 h-4 w-4" />
-                      My Profile
+                    <DropdownMenuItem asChild>
+                      <Link to={getDashboardLink()}>
+                        <User className="mr-2 h-4 w-4" />
+                        Dashboard
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
                       <Settings className="mr-2 h-4 w-4" />
@@ -132,18 +150,22 @@ const Header = ({ userRole = null }: HeaderProps) => {
                           <Store className="mr-2 h-4 w-4" />
                           My Store
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <span className="mr-2 h-4 w-4">💎</span>
-                          Subscription
+                        <DropdownMenuItem asChild>
+                          <Link to="/subscription-plans">
+                            <span className="mr-2 h-4 w-4">💎</span>
+                            Subscription
+                          </Link>
                         </DropdownMenuItem>
                       </>
                     )}
                     {userRole === 'admin' && (
                       <>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                          <Shield className="mr-2 h-4 w-4" />
-                          Admin Dashboard
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin-dashboard">
+                            <Shield className="mr-2 h-4 w-4" />
+                            Admin Dashboard
+                          </Link>
                         </DropdownMenuItem>
                       </>
                     )}

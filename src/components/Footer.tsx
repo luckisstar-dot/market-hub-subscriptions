@@ -2,6 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { Link } from 'react-router-dom';
 import { 
   Store, 
   Mail, 
@@ -18,45 +19,45 @@ const Footer = () => {
     {
       title: 'Marketplace',
       links: [
-        'Browse Products',
-        'Vendor Directory',
-        'Categories',
-        'New Arrivals',
-        'Best Sellers',
-        'Special Offers'
+        { name: 'Browse Products', href: '/browse-products' },
+        { name: 'Vendor Directory', href: '/vendor-directory' },
+        { name: 'Categories', href: '/categories' },
+        { name: 'New Arrivals', href: '/new-arrivals' },
+        { name: 'Best Sellers', href: '/best-sellers' },
+        { name: 'Special Offers', href: '/special-offers' }
       ]
     },
     {
       title: 'For Vendors',
       links: [
-        'Start Selling',
-        'Subscription Plans',
-        'Vendor Dashboard',
-        'Analytics',
-        'Support Center',
-        'Success Stories'
+        { name: 'Start Selling', href: '/start-selling' },
+        { name: 'Subscription Plans', href: '/subscription-plans' },
+        { name: 'Vendor Dashboard', href: '/vendor-dashboard' },
+        { name: 'Analytics', href: '#' },
+        { name: 'Support Center', href: '/help-center' },
+        { name: 'Success Stories', href: '#' }
       ]
     },
     {
       title: 'Support',
       links: [
-        'Help Center',
-        'Contact Us',
-        'Shipping Info',
-        'Returns',
-        'Payment Methods',
-        'Security'
+        { name: 'Help Center', href: '/help-center' },
+        { name: 'Contact Us', href: '/contact-us' },
+        { name: 'Shipping Info', href: '#' },
+        { name: 'Returns', href: '#' },
+        { name: 'Payment Methods', href: '#' },
+        { name: 'Security', href: '#' }
       ]
     },
     {
       title: 'Company',
       links: [
-        'About Us',
-        'Careers',
-        'Press',
-        'Blog',
-        'Investors',
-        'Partners'
+        { name: 'About Us', href: '/about-us' },
+        { name: 'Careers', href: '#' },
+        { name: 'Press', href: '#' },
+        { name: 'Blog', href: '#' },
+        { name: 'Investors', href: '#' },
+        { name: 'Partners', href: '#' }
       ]
     }
   ];
@@ -125,12 +126,12 @@ const Footer = () => {
                 <ul className="space-y-3">
                   {section.links.map((link, linkIndex) => (
                     <li key={linkIndex}>
-                      <a 
-                        href="#" 
+                      <Link 
+                        to={link.href}
                         className="text-gray-400 hover:text-white transition-colors duration-200"
                       >
-                        {link}
-                      </a>
+                        {link.name}
+                      </Link>
                     </li>
                   ))}
                 </ul>
