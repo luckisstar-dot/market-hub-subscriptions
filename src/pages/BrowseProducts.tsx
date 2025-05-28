@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,12 +11,20 @@ import Footer from '@/components/Footer';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 const BrowseProducts = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const { user } = useAuth();
   const { addToCart } = useCart();
+
+  useEffect(() => {
+    const searchParam = searchParams.get('search');
+    if (searchParam) {
+      setSearchQuery(searchParam);
+    }
+  }, [searchParams]);
 
   const { data: products, isLoading, error } = useQuery({
     queryKey: ['products', searchQuery],
@@ -31,7 +39,7 @@ const BrowseProducts = () => {
         .eq('status', 'active');
 
       if (searchQuery) {
-        query = query.ilike('name', `%${searchQuery}%`);
+        query = query.or(`name.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
       }
 
       const { data, error } = await query;
@@ -60,6 +68,9 @@ const BrowseProducts = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Browse Products</h1>
+          {searchQuery && (
+            <p className="text-gray-600 mb-4">Search results for "{searchQuery}"</p>
+          )}
           
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="flex-1">
@@ -102,38 +113,49 @@ const BrowseProducts = () => {
           </div>
         ) : !products || products.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-gray-600">No products found.</p>
+            <p className="text-gray-600">
+              {searchQuery ? `No products found for "${searchQuery}".` : 'No products found.'}
+            </p>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {products.map((product) => (
-              <Card key={product.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader className="p-4">
-                  <div className="aspect-square bg-gray-200 rounded-lg mb-4 flex items-center justify-center">
-                    <span className="text-gray-500">No Image</span>
-                  </div>
-                  <CardTitle className="text-lg">{product.name}</CardTitle>
-                  <p className="text-sm text-gray-600">{product.vendors?.business_name}</p>
-                </CardHeader>
-                <CardContent className="p-4 pt-0">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="flex items-center">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span className="text-sm ml-1">4.5</span>
+              <Link key={product.id} to={`/product/${product.id}`}>
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                  <CardHeader className="p-4">
+                    <div className="aspect-square bg-gray-200 rounded-lg mb-4 flex items-center justify-center">
+                      <span className="text-gray-500">No Image</span>
                     </div>
-                    <Badge variant="outline">{product.categories?.name}</Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xl font-bold text-marketplace-primary">
-                      ${product.price}
-                    </span>
-                    <Button size="sm" onClick={() => addToCart(product.id)}>
-                      <ShoppingCart className="h-4 w-4 mr-2" />
-                      Add to Cart
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                    <CardTitle className="text-lg">{product.name}</CardTitle>
+                    <p className="text-sm text-gray-600">{product.vendors?.business_name}</p>
+                  </CardHeader>
+                  <CardContent className="p-4 pt-0">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center">
+                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        <span className="text-sm ml-1">4.5</span>
+                      </div>
+                      <Badge variant="outline">{product.categories?.name}</Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xl font-bold text-marketplace-primary">
+                        ${product.price}
+                      </span>
+                      <Button 
+                        size="sm" 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          addToCart(product.id);
+                        }}
+                      >
+                        <ShoppingCart className="h-4 w-4 mr-2" />
+                        Add to Cart
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         )}

@@ -1,6 +1,6 @@
 
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -32,6 +32,8 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
+import { useAuth } from '@/contexts/AuthContext';
+import SearchResults from './SearchResults';
 
 interface HeaderProps {
   userRole?: 'buyer' | 'vendor' | 'admin' | null;
@@ -39,11 +41,35 @@ interface HeaderProps {
 
 const Header = ({ userRole = null }: HeaderProps) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [showSearchResults, setShowSearchResults] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSearchResults(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Searching for:', searchQuery);
+    if (searchQuery.trim()) {
+      navigate(`/browse-products?search=${encodeURIComponent(searchQuery)}`);
+      setShowSearchResults(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
   };
 
   const getRoleIcon = () => {
@@ -151,7 +177,7 @@ const Header = ({ userRole = null }: HeaderProps) => {
                   </Link>
                 </NavigationMenuItem>
 
-                {!userRole && (
+                {!user && (
                   <NavigationMenuItem>
                     <Link to="/start-selling" className="text-sm font-medium transition-colors hover:text-primary">
                       Start Selling
@@ -163,7 +189,7 @@ const Header = ({ userRole = null }: HeaderProps) => {
           </div>
 
           {/* Search Bar */}
-          <div className="flex-1 max-w-lg mx-8 hidden md:block">
+          <div className="flex-1 max-w-lg mx-8 hidden md:block" ref={searchRef}>
             <form onSubmit={handleSearch} className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-5 w-5 text-gray-400" />
@@ -172,15 +198,25 @@ const Header = ({ userRole = null }: HeaderProps) => {
                 type="text"
                 placeholder="Search products, vendors..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setShowSearchResults(e.target.value.length > 0);
+                }}
+                onFocus={() => setShowSearchResults(searchQuery.length > 0)}
                 className="pl-10 pr-4 w-full"
               />
+              {showSearchResults && (
+                <SearchResults 
+                  searchQuery={searchQuery} 
+                  onClose={() => setShowSearchResults(false)} 
+                />
+              )}
             </form>
           </div>
 
           {/* Right Side Navigation */}
           <div className="flex items-center space-x-4">
-            {userRole ? (
+            {user ? (
               <>
                 {/* Notifications */}
                 <Button variant="ghost" size="sm" className="relative">
@@ -247,7 +283,7 @@ const Header = ({ userRole = null }: HeaderProps) => {
                       </>
                     )}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-red-600">
+                    <DropdownMenuItem onClick={handleSignOut} className="text-red-600">
                       Sign Out
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -255,14 +291,22 @@ const Header = ({ userRole = null }: HeaderProps) => {
               </>
             ) : (
               <>
-                <Button variant="ghost" size="sm">
-                  <LogIn className="h-4 w-4 mr-2" />
-                  Sign In
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/auth">
+                    <LogIn className="h-4 w-4 mr-2" />
+                    Sign In
+                  </Link>
                 </Button>
                 <Button size="sm" asChild>
-                  <Link to="/start-selling">
+                  <Link to="/auth">
                     <UserPlus className="h-4 w-4 mr-2" />
                     Sign Up
+                  </Link>
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/admin-auth">
+                    <Shield className="h-4 w-4 mr-2" />
+                    Admin
                   </Link>
                 </Button>
               </>
@@ -302,7 +346,7 @@ const Header = ({ userRole = null }: HeaderProps) => {
               <Link to="/special-offers" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
                 Special Offers
               </Link>
-              {!userRole && (
+              {!user && (
                 <Link to="/start-selling" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
                   Start Selling
                 </Link>

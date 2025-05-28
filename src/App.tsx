@@ -9,6 +9,8 @@ import { CartProvider } from "@/contexts/CartContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
+import AdminAuth from "./pages/AdminAuth";
+import ProductDetail from "./pages/ProductDetail";
 
 // Marketplace Pages
 import BrowseProducts from "./pages/BrowseProducts";
@@ -47,9 +49,11 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/admin-auth" element={<AdminAuth />} />
               
               {/* Marketplace Routes */}
               <Route path="/browse-products" element={<BrowseProducts />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
               <Route path="/vendor-directory" element={<VendorDirectory />} />
               <Route path="/categories" element={<Categories />} />
               <Route path="/new-arrivals" element={<NewArrivals />} />
