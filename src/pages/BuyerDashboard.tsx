@@ -1,4 +1,5 @@
 
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +17,8 @@ import {
 import Header from '@/components/Header';
 
 const BuyerDashboard = () => {
+  const navigate = useNavigate();
+
   const stats = [
     {
       title: 'Total Orders',
@@ -91,6 +94,10 @@ const BuyerDashboard = () => {
     }
   };
 
+  const handleViewAllOrders = () => {
+    navigate('/buyer/track-orders');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header userRole="buyer" />
@@ -118,12 +125,12 @@ const BuyerDashboard = () => {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Recent Orders */}
+          {/* Recent Orders - Now with Clickable View All */}
           <div className="lg:col-span-2">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Recent Orders</CardTitle>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={handleViewAllOrders}>
                   <Eye className="h-4 w-4 mr-2" />
                   View All Orders
                 </Button>
@@ -181,7 +188,7 @@ const BuyerDashboard = () => {
           </div>
         </div>
 
-        {/* Quick Actions */}
+        {/* Quick Actions - Now with Navigation */}
         <div className="mt-8">
           <Card>
             <CardHeader>
@@ -189,19 +196,19 @@ const BuyerDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Button className="flex flex-col h-20 gap-2">
+                <Button className="flex flex-col h-20 gap-2" onClick={() => navigate('/buyer/browse-products')}>
                   <Search className="h-5 w-5" />
                   Browse Products
                 </Button>
-                <Button variant="outline" className="flex flex-col h-20 gap-2">
+                <Button variant="outline" className="flex flex-col h-20 gap-2" onClick={() => navigate('/buyer/view-wishlist')}>
                   <Heart className="h-5 w-5" />
                   View Wishlist
                 </Button>
-                <Button variant="outline" className="flex flex-col h-20 gap-2">
+                <Button variant="outline" className="flex flex-col h-20 gap-2" onClick={() => navigate('/buyer/track-orders')}>
                   <Package className="h-5 w-5" />
                   Track Orders
                 </Button>
-                <Button variant="outline" className="flex flex-col h-20 gap-2">
+                <Button variant="outline" className="flex flex-col h-20 gap-2" onClick={() => navigate('/buyer/write-reviews')}>
                   <Star className="h-5 w-5" />
                   Write Reviews
                 </Button>

@@ -29,6 +29,25 @@ import VendorDashboard from "./pages/VendorDashboard";
 import BuyerDashboard from "./pages/BuyerDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 
+// Admin Dashboard Pages
+import ApproveVendors from "./pages/admin/ApproveVendors";
+import Analytics from "./pages/admin/Analytics";
+import SystemSettings from "./pages/admin/SystemSettings";
+import UserManagement from "./pages/admin/UserManagement";
+import ProductReports from "./pages/admin/ProductReports";
+
+// Vendor Dashboard Pages
+import AddProduct from "./pages/vendor/AddProduct";
+import VendorAnalytics from "./pages/vendor/VendorAnalytics";
+import ManageInventory from "./pages/vendor/ManageInventory";
+import Messages from "./pages/vendor/Messages";
+
+// Buyer Dashboard Pages
+import BuyerBrowseProducts from "./pages/buyer/BrowseProducts";
+import ViewWishlist from "./pages/buyer/ViewWishlist";
+import TrackOrders from "./pages/buyer/TrackOrders";
+import WriteReviews from "./pages/buyer/WriteReviews";
+
 // Support Pages
 import HelpCenter from "./pages/HelpCenter";
 import ContactUs from "./pages/ContactUs";
@@ -68,6 +87,25 @@ const App = () => (
               <Route path="/vendor-dashboard" element={<VendorDashboard />} />
               <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
               <Route path="/admin-dashboard" element={<AdminDashboard />} />
+              
+              {/* Admin Dashboard Sub-routes */}
+              <Route path="/admin/approve-vendors" element={<ApproveVendors />} />
+              <Route path="/admin/analytics" element={<Analytics />} />
+              <Route path="/admin/system-settings" element={<SystemSettings />} />
+              <Route path="/admin/user-management" element={<UserManagement />} />
+              <Route path="/admin/product-reports" element={<ProductReports />} />
+              
+              {/* Vendor Dashboard Sub-routes */}
+              <Route path="/vendor/add-product" element={<AddProduct />} />
+              <Route path="/vendor/analytics" element={<VendorAnalytics />} />
+              <Route path="/vendor/manage-inventory" element={<ManageInventory />} />
+              <Route path="/vendor/messages" element={<Messages />} />
+              
+              {/* Buyer Dashboard Sub-routes */}
+              <Route path="/buyer/browse-products" element={<BuyerBrowseProducts />} />
+              <Route path="/buyer/view-wishlist" element={<ViewWishlist />} />
+              <Route path="/buyer/track-orders" element={<TrackOrders />} />
+              <Route path="/buyer/write-reviews" element={<WriteReviews />} />
               
               {/* Support Routes */}
               <Route path="/help-center" element={<HelpCenter />} />
