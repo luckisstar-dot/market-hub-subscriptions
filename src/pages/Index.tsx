@@ -5,11 +5,21 @@ import FeaturedProducts from '@/components/FeaturedProducts';
 import CategoryShowcase from '@/components/CategoryShowcase';
 import CallToAction from '@/components/CallToAction';
 import Footer from '@/components/Footer';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Index = () => {
-  // For demo purposes, you can change this to test different user roles
-  // null = not logged in, 'buyer', 'vendor', or 'admin'
-  const userRole = null;
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  // Determine user role from the database once user is authenticated
+  const userRole = user ? 'buyer' : null; // For now, default to buyer. We can enhance this later.
 
   return (
     <div className="min-h-screen bg-white">
