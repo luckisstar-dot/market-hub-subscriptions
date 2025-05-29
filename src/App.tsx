@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import Index from "./pages/Index";
@@ -11,6 +12,8 @@ import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import AdminAuth from "./pages/AdminAuth";
 import ProductDetail from "./pages/ProductDetail";
+import Demo from "./pages/Demo";
+import SystemStatus from "./pages/SystemStatus";
 
 // Marketplace Pages
 import BrowseProducts from "./pages/BrowseProducts";
@@ -59,68 +62,72 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <CartProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/admin-auth" element={<AdminAuth />} />
-              
-              {/* Marketplace Routes */}
-              <Route path="/browse-products" element={<BrowseProducts />} />
-              <Route path="/product/:id" element={<ProductDetail />} />
-              <Route path="/vendor-directory" element={<VendorDirectory />} />
-              <Route path="/categories" element={<Categories />} />
-              <Route path="/new-arrivals" element={<NewArrivals />} />
-              <Route path="/best-sellers" element={<BestSellers />} />
-              <Route path="/special-offers" element={<SpecialOffers />} />
-              
-              {/* Vendor Routes */}
-              <Route path="/start-selling" element={<StartSelling />} />
-              <Route path="/subscription-plans" element={<SubscriptionPlans />} />
-              
-              {/* Dashboard Routes */}
-              <Route path="/vendor-dashboard" element={<VendorDashboard />} />
-              <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
-              <Route path="/admin-dashboard" element={<AdminDashboard />} />
-              
-              {/* Admin Dashboard Sub-routes */}
-              <Route path="/admin/approve-vendors" element={<ApproveVendors />} />
-              <Route path="/admin/analytics" element={<Analytics />} />
-              <Route path="/admin/system-settings" element={<SystemSettings />} />
-              <Route path="/admin/user-management" element={<UserManagement />} />
-              <Route path="/admin/product-reports" element={<ProductReports />} />
-              
-              {/* Vendor Dashboard Sub-routes */}
-              <Route path="/vendor/add-product" element={<AddProduct />} />
-              <Route path="/vendor/analytics" element={<VendorAnalytics />} />
-              <Route path="/vendor/manage-inventory" element={<ManageInventory />} />
-              <Route path="/vendor/messages" element={<Messages />} />
-              
-              {/* Buyer Dashboard Sub-routes */}
-              <Route path="/buyer/browse-products" element={<BuyerBrowseProducts />} />
-              <Route path="/buyer/view-wishlist" element={<ViewWishlist />} />
-              <Route path="/buyer/track-orders" element={<TrackOrders />} />
-              <Route path="/buyer/write-reviews" element={<WriteReviews />} />
-              
-              {/* Support Routes */}
-              <Route path="/help-center" element={<HelpCenter />} />
-              <Route path="/contact-us" element={<ContactUs />} />
-              
-              {/* Company Routes */}
-              <Route path="/about-us" element={<AboutUs />} />
-              
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </CartProvider>
-    </AuthProvider>
+    <HelmetProvider>
+      <AuthProvider>
+        <CartProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/admin-auth" element={<AdminAuth />} />
+                <Route path="/demo" element={<Demo />} />
+                <Route path="/system-status" element={<SystemStatus />} />
+                
+                {/* Marketplace Routes */}
+                <Route path="/browse-products" element={<BrowseProducts />} />
+                <Route path="/product/:id" element={<ProductDetail />} />
+                <Route path="/vendor-directory" element={<VendorDirectory />} />
+                <Route path="/categories" element={<Categories />} />
+                <Route path="/new-arrivals" element={<NewArrivals />} />
+                <Route path="/best-sellers" element={<BestSellers />} />
+                <Route path="/special-offers" element={<SpecialOffers />} />
+                
+                {/* Vendor Routes */}
+                <Route path="/start-selling" element={<StartSelling />} />
+                <Route path="/subscription-plans" element={<SubscriptionPlans />} />
+                
+                {/* Dashboard Routes */}
+                <Route path="/vendor-dashboard" element={<VendorDashboard />} />
+                <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
+                <Route path="/admin-dashboard" element={<AdminDashboard />} />
+                
+                {/* Admin Dashboard Sub-routes */}
+                <Route path="/admin/approve-vendors" element={<ApproveVendors />} />
+                <Route path="/admin/analytics" element={<Analytics />} />
+                <Route path="/admin/system-settings" element={<SystemSettings />} />
+                <Route path="/admin/user-management" element={<UserManagement />} />
+                <Route path="/admin/product-reports" element={<ProductReports />} />
+                
+                {/* Vendor Dashboard Sub-routes */}
+                <Route path="/vendor/add-product" element={<AddProduct />} />
+                <Route path="/vendor/analytics" element={<VendorAnalytics />} />
+                <Route path="/vendor/manage-inventory" element={<ManageInventory />} />
+                <Route path="/vendor/messages" element={<Messages />} />
+                
+                {/* Buyer Dashboard Sub-routes */}
+                <Route path="/buyer/browse-products" element={<BuyerBrowseProducts />} />
+                <Route path="/buyer/view-wishlist" element={<ViewWishlist />} />
+                <Route path="/buyer/track-orders" element={<TrackOrders />} />
+                <Route path="/buyer/write-reviews" element={<WriteReviews />} />
+                
+                {/* Support Routes */}
+                <Route path="/help-center" element={<HelpCenter />} />
+                <Route path="/contact-us" element={<ContactUs />} />
+                
+                {/* Company Routes */}
+                <Route path="/about-us" element={<AboutUs />} />
+                
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </CartProvider>
+      </AuthProvider>
+    </HelmetProvider>
   </QueryClientProvider>
 );
 

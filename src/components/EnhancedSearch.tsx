@@ -7,8 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Search, Filter, X } from 'lucide-react';
 import { useEnhancedSearch } from '@/hooks/useEnhancedSearch';
+import { useSearchAnalytics } from '@/hooks/useSearchAnalytics';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import React from 'react';
 
 interface EnhancedSearchProps {
   onResults: (results: any[]) => void;
@@ -25,6 +27,8 @@ const EnhancedSearch = ({ onResults, onQueryChange }: EnhancedSearchProps) => {
     vendor: '',
     inStock: false,
   });
+
+  const { trackSearch } = useSearchAnalytics();
 
   // Fetch categories and vendors for filter options
   const { data: categories } = useQuery({
@@ -51,8 +55,17 @@ const EnhancedSearch = ({ onResults, onQueryChange }: EnhancedSearchProps) => {
   React.useEffect(() => {
     if (searchResults) {
       onResults(searchResults);
+      
+      // Track search analytics
+      if (searchQuery) {
+        trackSearch.mutate({
+          searchQuery,
+          resultsCount: searchResults.length,
+          filtersApplied: filters,
+        });
+      }
     }
-  }, [searchResults, onResults]);
+  }, [searchResults, onResults, searchQuery, filters, trackSearch]);
 
   React.useEffect(() => {
     onQueryChange(searchQuery);

@@ -1,9 +1,10 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, User, ShoppingCart, LogIn, UserPlus, Store, Shield, Menu, X } from 'lucide-react';
+import { Search, User, ShoppingCart, LogIn, UserPlus, Store, Shield, Menu, X, Settings } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
 import { useAuth } from '@/contexts/AuthContext';
@@ -26,6 +27,7 @@ const Header = ({
   } = useAuth();
   const navigate = useNavigate();
   const searchRef = useRef<HTMLDivElement>(null);
+  
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -37,6 +39,7 @@ const Header = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+  
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -44,9 +47,11 @@ const Header = ({
       setShowSearchResults(false);
     }
   };
+  
   const handleSignOut = async () => {
     await signOut();
   };
+  
   const getRoleIcon = () => {
     switch (userRole) {
       case 'vendor':
@@ -57,6 +62,7 @@ const Header = ({
         return <User className="h-4 w-4" />;
     }
   };
+  
   const getRoleBadge = () => {
     switch (userRole) {
       case 'vendor':
@@ -67,6 +73,7 @@ const Header = ({
         return null;
     }
   };
+  
   const getDashboardLink = () => {
     switch (userRole) {
       case 'vendor':
@@ -79,6 +86,7 @@ const Header = ({
         return '/';
     }
   };
+  
   return <header className="bg-white shadow-md border-b sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
