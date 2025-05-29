@@ -3,14 +3,17 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, User, ShoppingCart, Bell, Settings, LogIn, UserPlus, Store, Shield, Menu, X } from 'lucide-react';
+import { Search, User, ShoppingCart, LogIn, UserPlus, Store, Shield, Menu, X } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
 import { useAuth } from '@/contexts/AuthContext';
 import SearchResults from './SearchResults';
+import NotificationDropdown from './NotificationDropdown';
+
 interface HeaderProps {
   userRole?: 'buyer' | 'vendor' | 'admin' | null;
 }
+
 const Header = ({
   userRole = null
 }: HeaderProps) => {
@@ -160,32 +163,42 @@ const Header = ({
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-5 w-5 text-gray-400" />
               </div>
-              <Input type="text" placeholder="Search products, vendors..." value={searchQuery} onChange={e => {
-              setSearchQuery(e.target.value);
-              setShowSearchResults(e.target.value.length > 0);
-            }} onFocus={() => setShowSearchResults(searchQuery.length > 0)} className="pl-10 pr-4 w-full" />
-              {showSearchResults && <SearchResults searchQuery={searchQuery} onClose={() => setShowSearchResults(false)} />}
+              <Input
+                type="text"
+                placeholder="Search products, vendors..."
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setShowSearchResults(e.target.value.length > 0);
+                }}
+                onFocus={() => setShowSearchResults(searchQuery.length > 0)}
+                className="pl-10 pr-4 w-full"
+              />
+              {showSearchResults && (
+                <SearchResults
+                  searchQuery={searchQuery}
+                  onClose={() => setShowSearchResults(false)}
+                />
+              )}
             </form>
           </div>
 
           {/* Right Side Navigation */}
           <div className="flex items-center space-x-4">
-            {user ? <>
+            {user ? (
+              <>
                 {/* Notifications */}
-                <Button variant="ghost" size="sm" className="relative">
-                  <Bell className="h-5 w-5" />
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs">
-                    3
-                  </Badge>
-                </Button>
+                <NotificationDropdown />
 
                 {/* Cart (for buyers) */}
-                {userRole === 'buyer' && <Button variant="ghost" size="sm" className="relative">
+                {userRole === 'buyer' && (
+                  <Button variant="ghost" size="sm" className="relative">
                     <ShoppingCart className="h-5 w-5" />
                     <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs">
                       2
                     </Badge>
-                  </Button>}
+                  </Button>
+                )}
 
                 {/* User Menu */}
                 <DropdownMenu>
@@ -235,7 +248,10 @@ const Header = ({
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </> : <>
+              </>
+            ) : (
+              <>
+                {/* Sign In/Up buttons */}
                 <Button variant="ghost" size="sm" asChild>
                   <Link to="/auth">
                     <LogIn className="h-4 w-4 mr-2" />
@@ -254,10 +270,16 @@ const Header = ({
                     Admin
                   </Link>
                 </Button>
-              </>}
+              </>
+            )}
 
             {/* Mobile menu button */}
-            <Button variant="ghost" size="sm" className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="md:hidden"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
@@ -292,4 +314,5 @@ const Header = ({
       </div>
     </header>;
 };
+
 export default Header;

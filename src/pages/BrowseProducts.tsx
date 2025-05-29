@@ -1,52 +1,22 @@
 
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Search, Filter, Star, ShoppingCart } from 'lucide-react';
+import { Star, ShoppingCart } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { Link, useSearchParams } from 'react-router-dom';
+import EnhancedSearch from '@/components/EnhancedSearch';
 
 const BrowseProducts = () => {
   const [searchParams] = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [currentQuery, setCurrentQuery] = useState(searchParams.get('search') || '');
   const { user } = useAuth();
   const { addToCart } = useCart();
-
-  useEffect(() => {
-    const searchParam = searchParams.get('search');
-    if (searchParam) {
-      setSearchQuery(searchParam);
-    }
-  }, [searchParams]);
-
-  const { data: products, isLoading, error } = useQuery({
-    queryKey: ['products', searchQuery],
-    queryFn: async () => {
-      let query = supabase
-        .from('products')
-        .select(`
-          *,
-          vendors(business_name),
-          categories(name)
-        `)
-        .eq('status', 'active');
-
-      if (searchQuery) {
-        query = query.or(`name.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      return data;
-    },
-  });
 
   if (!user) {
     return (
@@ -68,63 +38,38 @@ const BrowseProducts = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Browse Products</h1>
-          {searchQuery && (
-            <p className="text-gray-600 mb-4">Search results for "{searchQuery}"</p>
+          {currentQuery && (
+            <p className="text-gray-600 mb-4">Search results for "{currentQuery}"</p>
           )}
           
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <Button variant="outline" className="flex items-center gap-2">
-              <Filter className="h-4 w-4" />
-              Filters
-            </Button>
-          </div>
+          <EnhancedSearch 
+            onResults={setSearchResults}
+            onQueryChange={setCurrentQuery}
+          />
         </div>
 
-        {isLoading ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <Card key={i} className="animate-pulse">
-                <CardHeader className="p-4">
-                  <div className="aspect-square bg-gray-200 rounded-lg mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-                </CardHeader>
-                <CardContent className="p-4 pt-0">
-                  <div className="h-3 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-6 bg-gray-200 rounded"></div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : error ? (
-          <div className="text-center py-8">
-            <p className="text-red-600">Error loading products. Please try again.</p>
-          </div>
-        ) : !products || products.length === 0 ? (
+        {searchResults.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-gray-600">
-              {searchQuery ? `No products found for "${searchQuery}".` : 'No products found.'}
+              {currentQuery ? `No products found for "${currentQuery}".` : 'No products found.'}
             </p>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {products.map((product) => (
+            {searchResults.map((product) => (
               <Link key={product.id} to={`/product/${product.id}`}>
                 <Card className="hover:shadow-lg transition-shadow cursor-pointer">
                   <CardHeader className="p-4">
-                    <div className="aspect-square bg-gray-200 rounded-lg mb-4 flex items-center justify-center">
-                      <span className="text-gray-500">No Image</span>
+                    <div className="aspect-square bg-gray-200 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+                      {product.images && product.images.length > 0 ? (
+                        <img 
+                          src={product.images[0]} 
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-gray-500">No Image</span>
+                      )}
                     </div>
                     <CardTitle className="text-lg">{product.name}</CardTitle>
                     <p className="text-sm text-gray-600">{product.vendors?.business_name}</p>

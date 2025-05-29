@@ -5,31 +5,112 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Save, Upload } from 'lucide-react';
+import { Plus, Save } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
+import FileUpload from '@/components/FileUpload';
 
 const AddProduct = () => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: '',
-    category: '',
-    stockQuantity: '',
-    images: []
+    category_id: '',
+    stock_quantity: '',
+    images: [] as string[]
   });
 
-  const categories = [
-    'Electronics',
-    'Clothing',
-    'Food & Beverages',
-    'Arts & Crafts',
-    'Home & Garden',
-    'Sports & Outdoors'
-  ];
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  // Fetch categories
+  const { data: categories } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('categories').select('*');
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch vendor information
+  const { data: vendor } = useQuery({
+    queryKey: ['vendor', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from('vendors')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  const createProduct = useMutation({
+    mutationFn: async (productData: typeof formData) => {
+      if (!vendor?.id) throw new Error('Vendor not found');
+
+      const { data, error } = await supabase
+        .from('products')
+        .insert({
+          name: productData.name,
+          description: productData.description,
+          price: parseFloat(productData.price),
+          category_id: productData.category_id,
+          stock_quantity: parseInt(productData.stock_quantity) || 0,
+          vendor_id: vendor.id,
+          images: productData.images,
+          status: 'active'
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Product created",
+        description: "Your product has been successfully created!",
+      });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      navigate('/vendor-dashboard');
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create product",
+        variant: "destructive",
+      });
+    },
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Product data:', formData);
+    
+    if (!formData.name || !formData.price || !formData.category_id) {
+      toast({
+        title: "Missing required fields",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    createProduct.mutate(formData);
+  };
+
+  const handleImageUpload = (urls: string[]) => {
+    setFormData(prev => ({ ...prev, images: urls }));
   };
 
   return (
@@ -63,14 +144,14 @@ const AddProduct = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">Category *</label>
-                  <Select onValueChange={(value) => setFormData({...formData, category: value})}>
+                  <Select onValueChange={(value) => setFormData({...formData, category_id: value})}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
+                      {categories?.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -104,8 +185,8 @@ const AddProduct = () => {
                   <label className="block text-sm font-medium mb-2">Stock Quantity</label>
                   <Input
                     type="number"
-                    value={formData.stockQuantity}
-                    onChange={(e) => setFormData({...formData, stockQuantity: e.target.value})}
+                    value={formData.stock_quantity}
+                    onChange={(e) => setFormData({...formData, stock_quantity: e.target.value})}
                     placeholder="0"
                   />
                 </div>
@@ -113,24 +194,27 @@ const AddProduct = () => {
 
               <div>
                 <label className="block text-sm font-medium mb-2">Product Images</label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                  <Upload className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-600 mb-2">Click to upload or drag and drop</p>
-                  <p className="text-sm text-gray-500">PNG, JPG, GIF up to 10MB</p>
-                  <Button type="button" variant="outline" className="mt-4">
-                    <Upload className="h-4 w-4 mr-2" />
-                    Choose Files
-                  </Button>
-                </div>
+                <FileUpload
+                  onUpload={handleImageUpload}
+                  maxFiles={5}
+                  existingImages={formData.images}
+                />
               </div>
 
               <div className="flex justify-end space-x-4">
-                <Button type="button" variant="outline">
-                  Save as Draft
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  onClick={() => navigate('/vendor-dashboard')}
+                >
+                  Cancel
                 </Button>
-                <Button type="submit">
+                <Button 
+                  type="submit"
+                  disabled={createProduct.isPending}
+                >
                   <Save className="h-4 w-4 mr-2" />
-                  Publish Product
+                  {createProduct.isPending ? 'Creating...' : 'Publish Product'}
                 </Button>
               </div>
             </form>
