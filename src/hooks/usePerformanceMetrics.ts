@@ -1,7 +1,5 @@
 
 import { useEffect } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 
 interface PerformanceMetric {
   metric_name: string;
@@ -10,16 +8,13 @@ interface PerformanceMetric {
 }
 
 export const usePerformanceMetrics = () => {
-  const recordMetric = useMutation({
-    mutationFn: async (metric: PerformanceMetric) => {
-      const { data, error } = await supabase
-        .from('performance_metrics')
-        .insert(metric);
-
-      if (error) throw error;
-      return data;
+  // Mock implementation since performance_metrics table doesn't exist
+  const recordMetric = {
+    mutate: (metric: PerformanceMetric) => {
+      console.log('Recording performance metric:', metric);
+      // This would normally save to database
     },
-  });
+  };
 
   const recordPageLoad = (pageName: string, loadTime: number) => {
     recordMetric.mutate({
@@ -50,8 +45,8 @@ export const usePerformanceMetrics = () => {
     const measurePagePerformance = () => {
       if (typeof window !== 'undefined' && 'performance' in window) {
         const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-        if (navigation) {
-          const loadTime = navigation.loadEventEnd - navigation.navigationStart;
+        if (navigation && navigation.loadEventEnd && navigation.fetchStart) {
+          const loadTime = navigation.loadEventEnd - navigation.fetchStart;
           recordPageLoad(window.location.pathname, loadTime);
         }
       }

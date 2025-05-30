@@ -40,8 +40,16 @@ export const useNotifications = () => {
 
       if (error) throw error;
 
-      setNotifications(data || []);
-      setUnreadCount(data?.filter(n => !n.read).length || 0);
+      // Type cast and ensure type field matches our interface
+      const typedNotifications: Notification[] = (data || []).map(notification => ({
+        ...notification,
+        type: ['info', 'success', 'warning', 'error'].includes(notification.type) 
+          ? notification.type as 'info' | 'success' | 'warning' | 'error'
+          : 'info'
+      }));
+
+      setNotifications(typedNotifications);
+      setUnreadCount(typedNotifications.filter(n => !n.read).length);
     } catch (error) {
       console.error('Error fetching notifications:', error);
     } finally {
@@ -61,7 +69,12 @@ export const useNotifications = () => {
           filter: `user_id=eq.${user?.id}`,
         },
         (payload) => {
-          const newNotification = payload.new as Notification;
+          const newNotification = {
+            ...payload.new,
+            type: ['info', 'success', 'warning', 'error'].includes(payload.new.type) 
+              ? payload.new.type as 'info' | 'success' | 'warning' | 'error'
+              : 'info'
+          } as Notification;
           setNotifications(prev => [newNotification, ...prev]);
           setUnreadCount(prev => prev + 1);
         }
@@ -75,7 +88,12 @@ export const useNotifications = () => {
           filter: `user_id=eq.${user?.id}`,
         },
         (payload) => {
-          const updatedNotification = payload.new as Notification;
+          const updatedNotification = {
+            ...payload.new,
+            type: ['info', 'success', 'warning', 'error'].includes(payload.new.type) 
+              ? payload.new.type as 'info' | 'success' | 'warning' | 'error'
+              : 'info'
+          } as Notification;
           setNotifications(prev =>
             prev.map(n => n.id === updatedNotification.id ? updatedNotification : n)
           );

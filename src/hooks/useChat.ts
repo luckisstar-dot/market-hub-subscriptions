@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 
 // Mock interfaces for chat functionality
 interface ChatRoom {
@@ -24,7 +25,7 @@ interface ChatMessage {
   };
 }
 
-export const useChat = () => {
+export const useChat = (selectedRoomId?: string) => {
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
@@ -65,20 +66,34 @@ export const useChat = () => {
     }
   };
 
-  const sendMessage = async (messageData: {
-    roomId: string;
-    content: string;
-    messageType?: 'text' | 'image' | 'file';
-  }) => {
-    try {
-      console.log('Sending message:', messageData);
-      // Mock implementation - would send message to database
-      return { id: 'mock-message-id', ...messageData };
-    } catch (error) {
-      console.error('Error sending message:', error);
-      throw error;
-    }
-  };
+  const sendMessage = useMutation({
+    mutationFn: async (messageData: {
+      content: string;
+      messageType?: 'text' | 'image' | 'file';
+    }) => {
+      try {
+        console.log('Sending message:', { ...messageData, roomId: selectedRoomId });
+        // Mock implementation - would send message to database
+        const newMessage = {
+          id: 'mock-message-id',
+          room_id: selectedRoomId || '',
+          sender_id: 'mock-user-id',
+          content: messageData.content,
+          message_type: messageData.messageType || 'text',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        
+        // Add to local messages for demo
+        setMessages(prev => [...prev, newMessage]);
+        
+        return newMessage;
+      } catch (error) {
+        console.error('Error sending message:', error);
+        throw error;
+      }
+    },
+  });
 
   return {
     rooms,
