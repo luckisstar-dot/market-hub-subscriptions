@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +11,7 @@ import Footer from '@/components/Footer';
 
 const VendorDirectory = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
 
   const vendors = [
     {
@@ -43,6 +45,10 @@ const VendorDirectory = () => {
       description: 'Authentic North African spices and seasoning blends.'
     }
   ];
+
+  const handleViewStore = (vendorId: number) => {
+    navigate(`/vendor-store/${vendorId}`);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -104,7 +110,12 @@ const VendorDirectory = () => {
 
                 <Badge variant="outline" className="mb-4">{vendor.category}</Badge>
                 
-                <Button className="w-full">View Store</Button>
+                <Button 
+                  className="w-full" 
+                  onClick={() => handleViewStore(vendor.id)}
+                >
+                  View Store
+                </Button>
               </CardContent>
             </Card>
           ))}

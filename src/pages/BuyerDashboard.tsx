@@ -15,6 +15,7 @@ import {
   Truck
 } from 'lucide-react';
 import Header from '@/components/Header';
+import BuyerChat from '@/components/BuyerChat';
 
 const BuyerDashboard = () => {
   const navigate = useNavigate();
@@ -124,7 +125,7 @@ const BuyerDashboard = () => {
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-8 mb-8">
           {/* Recent Orders - Now with Clickable View All */}
           <div className="lg:col-span-2">
             <Card>
@@ -186,6 +187,11 @@ const BuyerDashboard = () => {
               </CardContent>
             </Card>
           </div>
+        </div>
+
+        {/* Chat Component */}
+        <div className="mb-8">
+          <BuyerChat />
         </div>
 
         {/* Quick Actions - Now with Navigation */}

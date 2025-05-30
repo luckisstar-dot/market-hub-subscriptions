@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -44,6 +45,7 @@ import AddProduct from "./pages/vendor/AddProduct";
 import VendorAnalytics from "./pages/vendor/VendorAnalytics";
 import ManageInventory from "./pages/vendor/ManageInventory";
 import Messages from "./pages/vendor/Messages";
+import VendorStore from "./pages/vendor/VendorStore";
 
 // Buyer Dashboard Pages
 import BuyerBrowseProducts from "./pages/buyer/BrowseProducts";
@@ -80,6 +82,7 @@ const App = () => (
                 <Route path="/browse-products" element={<BrowseProducts />} />
                 <Route path="/product/:id" element={<ProductDetail />} />
                 <Route path="/vendor-directory" element={<VendorDirectory />} />
+                <Route path="/vendor-store/:vendorId" element={<VendorStore />} />
                 <Route path="/categories" element={<Categories />} />
                 <Route path="/new-arrivals" element={<NewArrivals />} />
                 <Route path="/best-sellers" element={<BestSellers />} />
