@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -14,7 +13,7 @@ interface HeaderProps {
 const Header = ({ userRole }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
-  const { itemCount } = useCart();
+  const { cartCount } = useCart();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -86,9 +85,9 @@ const Header = ({ userRole }: HeaderProps) => {
                 {(userRole === 'buyer' || !userRole) && (
                   <Button variant="ghost" size="sm" className="relative">
                     <ShoppingCart className="h-5 w-5" />
-                    {itemCount > 0 && (
+                    {cartCount > 0 && (
                       <span className="absolute -top-1 -right-1 bg-marketplace-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                        {itemCount}
+                        {cartCount}
                       </span>
                     )}
                   </Button>

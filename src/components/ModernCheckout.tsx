@@ -17,7 +17,10 @@ interface ModernCheckoutProps {
 const ModernCheckout = ({ onClose, onSuccess }: ModernCheckoutProps) => {
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'paypal'>('card');
   const [isProcessing, setIsProcessing] = useState(false);
-  const { items, total, clearCart } = useCart();
+  const { cartItems, clearCart } = useCart();
+
+  // Calculate total from cart items
+  const total = cartItems.reduce((sum, item) => sum + (item.products.price * item.quantity), 0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,14 +49,14 @@ const ModernCheckout = ({ onClose, onSuccess }: ModernCheckoutProps) => {
             </div>
             
             <div className="space-y-4 mb-6">
-              {items.map((item) => (
+              {cartItems.map((item) => (
                 <div key={item.id} className="flex items-center space-x-3">
                   <div className="w-12 h-12 bg-gray-200 rounded-lg flex-shrink-0"></div>
                   <div className="flex-1">
-                    <h4 className="font-medium text-sm">Product #{item.id}</h4>
+                    <h4 className="font-medium text-sm">{item.products.name}</h4>
                     <p className="text-gray-600 text-sm">Qty: {item.quantity}</p>
                   </div>
-                  <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+                  <span className="font-medium">${(item.products.price * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
             </div>
