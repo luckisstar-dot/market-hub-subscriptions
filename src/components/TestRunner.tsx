@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -89,8 +88,9 @@ const TestRunner = () => {
     completedTests++;
     setProgress((completedTests / totalTests) * 100);
 
-    // Database Tests
-    const tables = ['profiles', 'products', 'categories', 'vendors', 'orders'];
+    // Database Tests - Fix TypeScript issue by explicitly typing table names
+    const tables: Array<'profiles' | 'products' | 'categories' | 'vendors' | 'orders'> = 
+      ['profiles', 'products', 'categories', 'vendors', 'orders'];
     
     for (const table of tables) {
       try {

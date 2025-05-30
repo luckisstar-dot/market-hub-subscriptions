@@ -54,7 +54,7 @@ const AdminAnalytics = () => {
       const totalOrders = ordersResult.data?.length || 0;
       const totalProducts = productsResult.data?.length || 0;
       const totalRevenue = ordersResult.data?.reduce((sum, order) => {
-        return sum + parseFloat(order.total_amount || '0');
+        return sum + parseFloat(String(order.total_amount || '0'));
       }, 0) || 0;
       const conversionRate = totalUsers > 0 ? (totalOrders / totalUsers) * 100 : 0;
 

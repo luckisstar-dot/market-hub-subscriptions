@@ -127,7 +127,7 @@ export const enhancedEmailService = {
           <p>You will receive a shipping notification once your order is on its way.</p>
           <p>Thank you for your purchase!</p>
         `,
-        variables: { customer_name: '', order_id: '', total_amount: '' },
+        variables: { customer_name: '', order_id: '', total_amount: '0' },
       },
       {
         name: 'password_reset',

@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { enhancedEmailService } from './enhancedEmailService';
 
@@ -50,8 +49,8 @@ export const performEnhancedSystemCheck = async (): Promise<SystemCheckResult[]>
     });
   }
 
-  // 2. Database Connectivity Check
-  const existingTables = [
+  // 2. Database Connectivity Check - Fix TypeScript issue
+  const existingTables: Array<'profiles' | 'products' | 'categories' | 'vendors' | 'notifications' | 'cart_items' | 'orders' | 'order_items' | 'reviews' | 'wishlist_items'> = [
     'profiles', 'products', 'categories', 'vendors', 'notifications',
     'cart_items', 'orders', 'order_items', 'reviews', 'wishlist_items'
   ];
