@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -38,6 +37,7 @@ import Analytics from "./pages/admin/Analytics";
 import SystemSettings from "./pages/admin/SystemSettings";
 import UserManagement from "./pages/admin/UserManagement";
 import ProductReports from "./pages/admin/ProductReports";
+import TestCenter from "./pages/admin/TestCenter";
 
 // Vendor Dashboard Pages
 import AddProduct from "./pages/vendor/AddProduct";
@@ -100,6 +100,7 @@ const App = () => (
                 <Route path="/admin/system-settings" element={<SystemSettings />} />
                 <Route path="/admin/user-management" element={<UserManagement />} />
                 <Route path="/admin/product-reports" element={<ProductReports />} />
+                <Route path="/admin/test-center" element={<TestCenter />} />
                 
                 {/* Vendor Dashboard Sub-routes */}
                 <Route path="/vendor/add-product" element={<AddProduct />} />

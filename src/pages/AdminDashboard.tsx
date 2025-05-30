@@ -203,7 +203,7 @@ const AdminDashboard = () => {
               <CardTitle>Admin Actions</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
                 <Button className="flex flex-col h-20 gap-2" onClick={() => navigate('/admin/approve-vendors')}>
                   <UserCheck className="h-5 w-5" />
                   Approve Vendors
@@ -223,6 +223,10 @@ const AdminDashboard = () => {
                 <Button variant="outline" className="flex flex-col h-20 gap-2" onClick={() => navigate('/admin/product-reports')}>
                   <Package className="h-5 w-5" />
                   Product Reports
+                </Button>
+                <Button variant="outline" className="flex flex-col h-20 gap-2" onClick={() => navigate('/admin/test-center')}>
+                  <Shield className="h-5 w-5" />
+                  Test Center
                 </Button>
               </div>
             </CardContent>

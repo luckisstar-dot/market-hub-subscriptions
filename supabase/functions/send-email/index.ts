@@ -8,12 +8,10 @@ const corsHeaders = {
 };
 
 interface EmailRequest {
-  template: {
-    subject: string;
-    html_content: string;
-  };
-  recipientEmail: string;
-  variables: Record<string, any>;
+  to: string;
+  subject: string;
+  html: string;
+  from?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -22,43 +20,105 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { template, recipientEmail, variables }: EmailRequest = await req.json();
+    const { to, subject, html, from = "noreply@marketplace.com" }: EmailRequest = await req.json();
 
-    // Replace variables in template
-    let subject = template.subject;
-    let htmlContent = template.html_content;
-
-    Object.entries(variables).forEach(([key, value]) => {
-      const placeholder = `{{${key}}}`;
-      subject = subject.replace(new RegExp(placeholder, 'g'), String(value));
-      htmlContent = htmlContent.replace(new RegExp(placeholder, 'g'), String(value));
+    console.log('Email send request:', {
+      to,
+      subject,
+      from,
+      contentLength: html.length,
     });
 
-    // For now, we'll log the email instead of actually sending it
-    // In production, you would integrate with a service like Resend, SendGrid, etc.
-    console.log(`Email would be sent to: ${recipientEmail}`);
-    console.log(`Subject: ${subject}`);
-    console.log(`Content: ${htmlContent}`);
+    // Check if this is a test request
+    if (req.url.includes('?test=true') || JSON.stringify(req.body).includes('"test":true')) {
+      console.log('Test email request - not sending actual email');
+      return new Response(JSON.stringify({
+        id: 'test-email-id',
+        status: 'sent',
+        message: 'Test email logged successfully'
+      }), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          ...corsHeaders,
+        },
+      });
+    }
 
-    // Simulate successful sending
-    const response = {
-      id: crypto.randomUUID(),
-      to: recipientEmail,
+    // Check for Resend API key
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    
+    if (!resendApiKey) {
+      console.log('No Resend API key found - logging email instead of sending');
+      
+      // Log the email for development purposes
+      console.log(`
+        ===== EMAIL LOGGED =====
+        From: ${from}
+        To: ${to}
+        Subject: ${subject}
+        HTML Content: ${html}
+        ========================
+      `);
+      
+      return new Response(JSON.stringify({
+        id: `mock-${crypto.randomUUID()}`,
+        status: 'logged',
+        message: 'Email logged successfully (no API key configured)'
+      }), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          ...corsHeaders,
+        },
+      });
+    }
+
+    // Send actual email using Resend
+    const emailData = {
+      from,
+      to: [to],
       subject,
-      status: 'sent',
+      html,
     };
 
-    return new Response(JSON.stringify(response), {
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${resendApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(emailData),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error("Resend API error:", error);
+      throw new Error(`Resend API error: ${response.status} ${error}`);
+    }
+
+    const result = await response.json();
+    console.log("Email sent successfully via Resend:", result.id);
+
+    return new Response(JSON.stringify({
+      id: result.id,
+      status: 'sent',
+      message: 'Email sent successfully via Resend'
+    }), {
       status: 200,
       headers: {
         "Content-Type": "application/json",
         ...corsHeaders,
       },
     });
+
   } catch (error: any) {
     console.error("Error in send-email function:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        status: 'failed'
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
