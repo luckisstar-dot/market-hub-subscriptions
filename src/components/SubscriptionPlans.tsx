@@ -4,8 +4,38 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Check, Star, Crown, Zap, Store, Users, Briefcase, Building2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const SubscriptionPlans = () => {
+  const navigate = useNavigate();
+
+  const handlePlanSelection = (userType: 'buyer' | 'vendor', planName: string, price: string) => {
+    const isFree = price === '$0';
+    
+    if (isFree) {
+      // For free plans, go directly to registration
+      if (userType === 'buyer') {
+        navigate('/auth?type=buyer&plan=free');
+      } else {
+        navigate('/vendor-registration?plan=free');
+      }
+    } else {
+      // For paid plans, go to checkout first
+      const planData = {
+        userType,
+        planName,
+        price: price.split(' ')[0], // Get just the price part before any dash
+        redirectUrl: userType === 'buyer' ? '/auth?type=buyer' : '/vendor-registration'
+      };
+      
+      // Store plan data in sessionStorage for the checkout process
+      sessionStorage.setItem('selectedPlan', JSON.stringify(planData));
+      
+      // Navigate to checkout with plan context
+      navigate('/checkout', { state: planData });
+    }
+  };
+
   const vendorPlans = [
     {
       name: 'Basic Listing',
@@ -29,7 +59,7 @@ const SubscriptionPlans = () => {
     {
       name: 'Growth Partner',
       subtitle: 'Standard',
-      price: '$9.99 - $19.99',
+      price: '$9.99',
       period: '/month',
       description: 'Serious vendors with limited product catalog',
       icon: Star,
@@ -48,7 +78,7 @@ const SubscriptionPlans = () => {
     {
       name: 'Pro Partner',
       subtitle: 'Pro',
-      price: '$21.99 - $39.99',
+      price: '$21.99',
       period: '/month',
       description: 'Mid-size vendors, small African exporters',
       icon: Crown,
@@ -69,7 +99,7 @@ const SubscriptionPlans = () => {
     {
       name: 'Power Vendor',
       subtitle: 'Premium/Elite',
-      price: '$99.99 - $149.99',
+      price: '$99.99',
       period: '/month',
       description: 'Large-scale vendors, wholesalers, agencies',
       icon: Building2,
@@ -111,7 +141,7 @@ const SubscriptionPlans = () => {
     {
       name: 'Buyer Connect',
       subtitle: 'Verified Buyer',
-      price: '$9.99 - $19.99',
+      price: '$9.99',
       period: '/month',
       description: 'Small-scale buyers, boutique stores',
       icon: Store,
@@ -129,7 +159,7 @@ const SubscriptionPlans = () => {
     {
       name: 'Direct Trade',
       subtitle: 'Business Buyer',
-      price: '$21.99 - $39.99',
+      price: '$21.99',
       period: '/month',
       description: 'Resellers, wholesalers, distributors',
       icon: Briefcase,
@@ -148,7 +178,7 @@ const SubscriptionPlans = () => {
     {
       name: 'Global Access Pass',
       subtitle: 'Corporate Buyer',
-      price: '$149.99 - $199.99',
+      price: '$149.99',
       period: '/month',
       description: 'Corporate procurement teams, export agents',
       icon: Building2,
@@ -173,7 +203,7 @@ const SubscriptionPlans = () => {
     { name: 'Custom Packaging Coordination', price: 'Pricing on request' },
   ];
 
-  const renderPlans = (plans: typeof vendorPlans) => (
+  const renderPlans = (plans: typeof vendorPlans, userType: 'buyer' | 'vendor') => (
     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
       {plans.map((plan, index) => (
         <Card 
@@ -205,6 +235,7 @@ const SubscriptionPlans = () => {
             <Button 
               className={`w-full mb-4 ${plan.buttonColor} text-white`}
               size="sm"
+              onClick={() => handlePlanSelection(userType, plan.name, plan.price)}
             >
               {plan.buttonText}
             </Button>
@@ -228,16 +259,16 @@ const SubscriptionPlans = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <Badge className="mb-4 bg-marketplace-secondary/10 text-marketplace-secondary border-marketplace-secondary/20">
-            Subscription Plans
+            Choose Your Plan
           </Badge>
           <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4">
-            Choose Your{' '}
+            Select Your{' '}
             <span className="bg-gradient-to-r from-marketplace-primary to-marketplace-secondary bg-clip-text text-transparent">
               Perfect Plan
             </span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Whether you're selling or buying, we have the right plan for your business needs.
+            Choose whether you're selling or buying, then select the plan that fits your needs.
           </p>
         </div>
 
@@ -258,7 +289,7 @@ const SubscriptionPlans = () => {
               <h3 className="text-2xl font-bold mb-2">Vendor Subscription Tiers</h3>
               <p className="text-gray-600">Sell your products globally with our tiered marketplace access</p>
             </div>
-            {renderPlans(vendorPlans)}
+            {renderPlans(vendorPlans, 'vendor')}
           </TabsContent>
 
           <TabsContent value="buyers">
@@ -266,7 +297,7 @@ const SubscriptionPlans = () => {
               <h3 className="text-2xl font-bold mb-2">Buyer Subscription Tiers</h3>
               <p className="text-gray-600">Access suppliers and products with different levels of engagement</p>
             </div>
-            {renderPlans(buyerPlans)}
+            {renderPlans(buyerPlans, 'buyer')}
             
             {/* Buyer Add-ons */}
             <div className="mt-12">

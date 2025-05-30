@@ -1,4 +1,3 @@
-
 import { EmailTemplate } from './types';
 
 export const emailTemplates: EmailTemplate[] = [
@@ -58,5 +57,20 @@ export const processTemplate = (template: EmailTemplate, variables: Record<strin
   return {
     subject: processedSubject,
     content: processedContent,
+  };
+};
+
+export const createOrderConfirmationTemplate = (customerName: string, total_amount: number, items: any[]) => {
+  return {
+    subject: 'Order Confirmation',
+    html: `
+      <h1>Thank you for your order, ${customerName}!</h1>
+      <p>Your order total: $${total_amount.toFixed(2)}</p>
+      <h3>Items:</h3>
+      <ul>
+        ${items.map(item => `<li>${item.name} - Qty: ${item.quantity}</li>`).join('')}
+      </ul>
+    `,
+    text: `Thank you for your order, ${customerName}! Your order total: $${total_amount.toFixed(2)}`
   };
 };

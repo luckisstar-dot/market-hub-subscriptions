@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +13,7 @@ import AdminAuth from "./pages/AdminAuth";
 import ProductDetail from "./pages/ProductDetail";
 import Demo from "./pages/Demo";
 import SystemStatus from "./pages/SystemStatus";
+import Checkout from "./pages/Checkout";
 
 // Marketplace Pages
 import BrowseProducts from "./pages/BrowseProducts";
@@ -77,6 +77,7 @@ const App = () => (
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/demo" element={<Demo />} />
                 <Route path="/system-status" element={<SystemStatus />} />
+                <Route path="/checkout" element={<Checkout />} />
                 
                 {/* Marketplace Routes */}
                 <Route path="/browse-products" element={<BrowseProducts />} />

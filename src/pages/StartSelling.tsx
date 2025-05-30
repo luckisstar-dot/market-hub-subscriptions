@@ -36,18 +36,18 @@ const StartSelling = () => {
   const steps = [
     {
       step: 1,
+      title: 'Choose Your Plan',
+      description: 'Select the subscription plan that fits your business needs'
+    },
+    {
+      step: 2,
       title: 'Create Your Account',
       description: 'Sign up and verify your business information'
     },
     {
-      step: 2,
-      title: 'Set Up Your Store',
-      description: 'Add your products, descriptions, and pricing'
-    },
-    {
       step: 3,
-      title: 'Go Live',
-      description: 'Start selling to customers around the world'
+      title: 'Start Selling',
+      description: 'Add your products and start selling to customers worldwide'
     }
   ];
 
@@ -68,10 +68,10 @@ const StartSelling = () => {
             size="lg" 
             variant="secondary" 
             className="text-lg px-8 py-4"
-            onClick={() => navigate('/vendor-registration')}
+            onClick={() => navigate('/subscription-plans')}
           >
             <Store className="h-5 w-5 mr-2" />
-            Start Your Journey
+            Choose Your Plan
             <ArrowRight className="h-5 w-5 ml-2" />
           </Button>
         </div>
@@ -129,15 +129,15 @@ const StartSelling = () => {
       <section className="py-20 bg-marketplace-primary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Selling?</h2>
-          <p className="text-xl text-blue-100 mb-8">Join our marketplace today and grow your business</p>
+          <p className="text-xl text-blue-100 mb-8">Choose your plan and join our marketplace today</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               size="lg" 
               variant="secondary"
-              onClick={() => navigate('/vendor-registration')}
+              onClick={() => navigate('/subscription-plans')}
             >
               <CheckCircle className="h-5 w-5 mr-2" />
-              Create Free Account
+              View Plans & Register
             </Button>
             <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-marketplace-primary">
               Learn More

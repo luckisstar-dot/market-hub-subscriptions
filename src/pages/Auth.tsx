@@ -1,13 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
-import { Loader2 } from 'lucide-react';
+import { Loader2, User, Store } from 'lucide-react';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -19,6 +20,11 @@ const Auth = () => {
   
   const { signUp, signIn, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  
+  const userType = searchParams.get('type'); // 'buyer' or null
+  const planType = searchParams.get('plan'); // 'free' or null
+  const isFreePlan = planType === 'free';
 
   useEffect(() => {
     if (user) {
@@ -47,13 +53,20 @@ const Auth = () => {
     setLoading(true);
     setError('');
     
-    const { error } = await signUp(email, password, fullName);
+    const userData = {
+      full_name: fullName,
+      user_type: userType || 'buyer',
+      plan_type: planType || 'free'
+    };
+    
+    const { error } = await signUp(email, password, userData);
     
     if (error) {
       setError(error.message);
     } else {
       setError('');
-      alert('Check your email for a confirmation link!');
+      alert('Account created successfully! Check your email for a confirmation link.');
+      navigate('/');
     }
     
     setLoading(false);
@@ -63,9 +76,24 @@ const Auth = () => {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-center text-2xl font-bold">
-            Welcome to Marketplace
-          </CardTitle>
+          <div className="text-center">
+            {userType && (
+              <div className="mb-4 flex justify-center">
+                <Badge className="flex items-center gap-2 bg-marketplace-primary/10 text-marketplace-primary">
+                  {userType === 'buyer' ? <User className="h-4 w-4" /> : <Store className="h-4 w-4" />}
+                  {userType === 'buyer' ? 'Buyer Account' : 'Vendor Account'}
+                </Badge>
+              </div>
+            )}
+            <CardTitle className="text-center text-2xl font-bold">
+              Welcome to OneShop Centrale
+            </CardTitle>
+            {isFreePlan && (
+              <p className="text-sm text-gray-600 mt-2">
+                Creating your free {userType || 'buyer'} account
+              </p>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -132,7 +160,7 @@ const Auth = () => {
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Sign Up
+                  {isFreePlan ? `Create Free ${userType || 'Buyer'} Account` : 'Sign Up'}
                 </Button>
               </form>
             </TabsContent>
