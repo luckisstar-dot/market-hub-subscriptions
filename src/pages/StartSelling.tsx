@@ -5,8 +5,11 @@ import { Badge } from '@/components/ui/badge';
 import { Store, Users, TrendingUp, Shield, CheckCircle, ArrowRight } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { useNavigate } from 'react-router-dom';
 
 const StartSelling = () => {
+  const navigate = useNavigate();
+
   const benefits = [
     {
       icon: Store,
@@ -61,7 +64,12 @@ const StartSelling = () => {
           <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
             Join thousands of vendors who are growing their business on our global marketplace platform
           </p>
-          <Button size="lg" variant="secondary" className="text-lg px-8 py-4">
+          <Button 
+            size="lg" 
+            variant="secondary" 
+            className="text-lg px-8 py-4"
+            onClick={() => navigate('/vendor-registration')}
+          >
             <Store className="h-5 w-5 mr-2" />
             Start Your Journey
             <ArrowRight className="h-5 w-5 ml-2" />
@@ -123,7 +131,11 @@ const StartSelling = () => {
           <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Selling?</h2>
           <p className="text-xl text-blue-100 mb-8">Join our marketplace today and grow your business</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary">
+            <Button 
+              size="lg" 
+              variant="secondary"
+              onClick={() => navigate('/vendor-registration')}
+            >
               <CheckCircle className="h-5 w-5 mr-2" />
               Create Free Account
             </Button>

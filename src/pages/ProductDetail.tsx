@@ -1,5 +1,6 @@
 
 import { useParams, Link } from 'react-router-dom';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,14 +8,18 @@ import { Badge } from '@/components/ui/badge';
 import { Star, Heart, ShoppingCart, ArrowLeft, Store } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ModernCheckout from '@/components/ModernCheckout';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
+import { useToast } from '@/hooks/use-toast';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const { addToCart } = useCart();
+  const { toast } = useToast();
+  const [showCheckout, setShowCheckout] = useState(false);
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['product', id],
@@ -41,6 +46,31 @@ const ProductDetail = () => {
     },
     enabled: !!id,
   });
+
+  const handleAddToCart = () => {
+    if (product) {
+      addToCart(product.id);
+      toast({
+        title: "Added to cart",
+        description: `${product.name} has been added to your cart.`,
+      });
+    }
+  };
+
+  const handleBuyNow = () => {
+    if (product) {
+      addToCart(product.id);
+      setShowCheckout(true);
+    }
+  };
+
+  const handleCheckoutSuccess = () => {
+    setShowCheckout(false);
+    toast({
+      title: "Order placed!",
+      description: "Thank you for your purchase. You'll receive a confirmation email shortly.",
+    });
+  };
 
   if (!user) {
     return (
@@ -176,7 +206,16 @@ const ProductDetail = () => {
               <Button 
                 size="lg" 
                 className="flex-1"
-                onClick={() => addToCart(product.id)}
+                onClick={handleBuyNow}
+                disabled={product.stock_quantity === 0}
+              >
+                Buy Now
+              </Button>
+              <Button 
+                variant="outline"
+                size="lg" 
+                className="flex-1"
+                onClick={handleAddToCart}
                 disabled={product.stock_quantity === 0}
               >
                 <ShoppingCart className="h-5 w-5 mr-2" />
@@ -204,7 +243,7 @@ const ProductDetail = () => {
                   {product.vendors.location && (
                     <p className="text-sm text-gray-500">📍 {product.vendors.location}</p>
                   )}
-                  <Link to={`/vendor/${product.vendors.id}`}>
+                  <Link to={`/vendor-store/${product.vendors.id}`}>
                     <Button variant="outline" size="sm" className="mt-3">
                       View Store
                     </Button>
@@ -215,6 +254,13 @@ const ProductDetail = () => {
           </div>
         </div>
       </div>
+
+      {showCheckout && (
+        <ModernCheckout
+          onClose={() => setShowCheckout(false)}
+          onSuccess={handleCheckoutSuccess}
+        />
+      )}
 
       <Footer />
     </div>

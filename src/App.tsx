@@ -25,6 +25,7 @@ import SpecialOffers from "./pages/SpecialOffers";
 
 // Vendor Pages
 import StartSelling from "./pages/StartSelling";
+import VendorRegistration from "./pages/VendorRegistration";
 import SubscriptionPlans from "./components/SubscriptionPlans";
 
 // Dashboard Pages
@@ -74,7 +75,6 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
-                <Route path="/admin-auth" element={<AdminAuth />} />
                 <Route path="/demo" element={<Demo />} />
                 <Route path="/system-status" element={<SystemStatus />} />
                 
@@ -90,6 +90,7 @@ const App = () => (
                 
                 {/* Vendor Routes */}
                 <Route path="/start-selling" element={<StartSelling />} />
+                <Route path="/vendor-registration" element={<VendorRegistration />} />
                 <Route path="/subscription-plans" element={<SubscriptionPlans />} />
                 
                 {/* Dashboard Routes */}

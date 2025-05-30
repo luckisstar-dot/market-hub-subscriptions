@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Save } from 'lucide-react';
+import { Plus, Save, Crown } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import FileUpload from '@/components/FileUpload';
+import Paywall from '@/components/Paywall';
 
 const AddProduct = () => {
   const [formData, setFormData] = useState({
@@ -28,6 +29,9 @@ const AddProduct = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  // Mock current subscription plan - in real app, this would come from user data
+  const currentPlan = 'Basic'; // Could be 'Basic', 'Growth', 'Pro', 'Premium'
 
   // Fetch categories
   const { data: categories } = useQuery({
@@ -123,103 +127,172 @@ const AddProduct = () => {
           <p className="text-gray-600">Create a new product listing for your store.</p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Plus className="h-5 w-5 mr-2" />
-              Product Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid gap-8">
+          {/* Basic Product Form */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Plus className="h-5 w-5 mr-2" />
+                Product Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Product Name *</label>
+                    <Input
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      placeholder="Enter product name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Category *</label>
+                    <Select onValueChange={(value) => setFormData({...formData, category_id: value})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories?.map((category) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
                 <div>
-                  <label className="block text-sm font-medium mb-2">Product Name *</label>
-                  <Input
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    placeholder="Enter product name"
-                    required
+                  <label className="block text-sm font-medium mb-2">Description</label>
+                  <Textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData({...formData, description: e.target.value})}
+                    placeholder="Describe your product..."
+                    rows={4}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Category *</label>
-                  <Select onValueChange={(value) => setFormData({...formData, category_id: value})}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories?.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Price ($) *</label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={formData.price}
+                      onChange={(e) => setFormData({...formData, price: e.target.value})}
+                      placeholder="0.00"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Stock Quantity</label>
+                    <Input
+                      type="number"
+                      value={formData.stock_quantity}
+                      onChange={(e) => setFormData({...formData, stock_quantity: e.target.value})}
+                      placeholder="0"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-2">Description</label>
-                <Textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({...formData, description: e.target.value})}
-                  placeholder="Describe your product..."
-                  rows={4}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Price ($) *</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={(e) => setFormData({...formData, price: e.target.value})}
-                    placeholder="0.00"
-                    required
+                  <label className="block text-sm font-medium mb-2">Product Images</label>
+                  <FileUpload
+                    onUpload={handleImageUpload}
+                    maxFiles={5}
+                    existingImages={formData.images}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Stock Quantity</label>
-                  <Input
-                    type="number"
-                    value={formData.stock_quantity}
-                    onChange={(e) => setFormData({...formData, stock_quantity: e.target.value})}
-                    placeholder="0"
-                  />
+
+                <div className="flex justify-end space-x-4">
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    onClick={() => navigate('/vendor-dashboard')}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    type="submit"
+                    disabled={createProduct.isPending}
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    {createProduct.isPending ? 'Creating...' : 'Publish Product'}
+                  </Button>
                 </div>
-              </div>
+              </form>
+            </CardContent>
+          </Card>
 
-              <div>
-                <label className="block text-sm font-medium mb-2">Product Images</label>
-                <FileUpload
-                  onUpload={handleImageUpload}
-                  maxFiles={5}
-                  existingImages={formData.images}
-                />
-              </div>
+          {/* Premium SEO Features - Behind Paywall */}
+          <Paywall
+            feature="SEO Optimization Tools"
+            requiredPlan="Growth"
+            currentPlan={currentPlan}
+            description="Optimize your product listings with advanced SEO tools, keyword suggestions, and search ranking analytics."
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Crown className="h-5 w-5 mr-2 text-yellow-500" />
+                  SEO Optimization
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">SEO Title</label>
+                    <Input placeholder="Optimized title for search engines" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Meta Description</label>
+                    <Textarea placeholder="Brief description for search results..." rows={2} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Keywords</label>
+                    <Input placeholder="Comma-separated keywords" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Paywall>
 
-              <div className="flex justify-end space-x-4">
-                <Button 
-                  type="button" 
-                  variant="outline"
-                  onClick={() => navigate('/vendor-dashboard')}
-                >
-                  Cancel
-                </Button>
-                <Button 
-                  type="submit"
-                  disabled={createProduct.isPending}
-                >
-                  <Save className="h-4 w-4 mr-2" />
-                  {createProduct.isPending ? 'Creating...' : 'Publish Product'}
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+          {/* Advanced Analytics - Behind Paywall */}
+          <Paywall
+            feature="Advanced Product Analytics"
+            requiredPlan="Pro"
+            currentPlan={currentPlan}
+            description="Track detailed product performance, competitor insights, and market trends to optimize your listings."
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Crown className="h-5 w-5 mr-2 text-purple-500" />
+                  Advanced Analytics Setup
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <input type="checkbox" id="trackViews" />
+                    <label htmlFor="trackViews">Track detailed product views</label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input type="checkbox" id="competitor" />
+                    <label htmlFor="competitor">Enable competitor price monitoring</label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input type="checkbox" id="trends" />
+                    <label htmlFor="trends">Market trend analysis</label>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Paywall>
+        </div>
       </div>
     </div>
   );
