@@ -1,12 +1,11 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, Car } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import Header from '@/components/Header';
 import { performSystemCheck, generateSystemReport } from '@/utils/systemCheck';
-import { Refresh } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import MetaTags from '@/components/SEO/MetaTags';
 
 interface SystemCheckResult {
@@ -83,7 +82,7 @@ const SystemStatus = () => {
               onClick={runSystemCheck} 
               disabled={loading}
             >
-              <Refresh className="h-4 w-4 mr-2" />
+              <RefreshCw className="h-4 w-4 mr-2" />
               {loading ? 'Running Check...' : 'Run Health Check'}
             </Button>
           </div>
