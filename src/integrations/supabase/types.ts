@@ -170,6 +170,41 @@ export type Database = {
         }
         Relationships: []
       }
+      password_reset_tokens: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          token: string
+          used: boolean | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          token: string
+          used?: boolean | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          token?: string
+          used?: boolean | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "password_reset_tokens_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           category_id: string | null
@@ -232,31 +267,52 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address: Json | null
           avatar_url: string | null
           created_at: string
           email: string
           full_name: string | null
           id: string
+          phone: string | null
+          plan_status: string | null
+          plan_type: string | null
           role: string | null
+          subscription_end_date: string | null
+          subscription_start_date: string | null
           updated_at: string
+          user_type: string | null
         }
         Insert: {
+          address?: Json | null
           avatar_url?: string | null
           created_at?: string
           email: string
           full_name?: string | null
           id: string
+          phone?: string | null
+          plan_status?: string | null
+          plan_type?: string | null
           role?: string | null
+          subscription_end_date?: string | null
+          subscription_start_date?: string | null
           updated_at?: string
+          user_type?: string | null
         }
         Update: {
+          address?: Json | null
           avatar_url?: string | null
           created_at?: string
           email?: string
           full_name?: string | null
           id?: string
+          phone?: string | null
+          plan_status?: string | null
+          plan_type?: string | null
           role?: string | null
+          subscription_end_date?: string | null
+          subscription_start_date?: string | null
           updated_at?: string
+          user_type?: string | null
         }
         Relationships: []
       }
@@ -305,6 +361,99 @@ export type Database = {
           },
         ]
       }
+      subscription_plans: {
+        Row: {
+          active: boolean | null
+          billing_interval: string
+          commission_rate: number | null
+          created_at: string
+          features: Json | null
+          id: string
+          max_orders: number | null
+          max_products: number | null
+          name: string
+          price: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean | null
+          billing_interval?: string
+          commission_rate?: number | null
+          created_at?: string
+          features?: Json | null
+          id?: string
+          max_orders?: number | null
+          max_products?: number | null
+          name: string
+          price: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean | null
+          billing_interval?: string
+          commission_rate?: number | null
+          created_at?: string
+          features?: Json | null
+          id?: string
+          max_orders?: number | null
+          max_products?: number | null
+          name?: string
+          price?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_subscriptions: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          id: string
+          payment_method: Json | null
+          plan_id: string | null
+          start_date: string
+          status: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          payment_method?: Json | null
+          plan_id?: string | null
+          start_date?: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          payment_method?: Json | null
+          plan_id?: string | null
+          start_date?: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vendors: {
         Row: {
           business_name: string
@@ -339,7 +488,15 @@ export type Database = {
           user_id?: string | null
           verified?: boolean | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "vendors_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       wishlist_items: {
         Row: {

@@ -80,6 +80,16 @@ const Auth = () => {
               </Button>
             </form>
             
+            <div className="mt-4 text-center">
+              <Button 
+                variant="link" 
+                className="text-sm text-marketplace-primary"
+                onClick={() => navigate('/forgot-password')}
+              >
+                Forgot your password?
+              </Button>
+            </div>
+            
             <div className="mt-6 text-center space-y-4">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
