@@ -1,4 +1,5 @@
 
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,9 +7,20 @@ import { Store, Users, TrendingUp, Shield, CheckCircle, ArrowRight } from 'lucid
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole } from '@/contexts/UserRoleContext';
 
 const StartSelling = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { userRole } = useUserRole();
+
+  useEffect(() => {
+    // If user is already signed in as a vendor, redirect to dashboard
+    if (user && userRole === 'vendor') {
+      navigate('/vendor-dashboard');
+    }
+  }, [user, userRole, navigate]);
 
   const benefits = [
     {
@@ -51,6 +63,16 @@ const StartSelling = () => {
     }
   ];
 
+  const handleGetStarted = () => {
+    if (user) {
+      // User is logged in but not a vendor, redirect to vendor registration
+      navigate('/vendor-registration');
+    } else {
+      // User not logged in, redirect to signup
+      navigate('/signup?type=vendor');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
@@ -68,7 +90,7 @@ const StartSelling = () => {
             size="lg" 
             variant="secondary" 
             className="text-lg px-8 py-4"
-            onClick={() => navigate('/signup')}
+            onClick={handleGetStarted}
           >
             <Store className="h-5 w-5 mr-2" />
             Get Started
@@ -134,7 +156,7 @@ const StartSelling = () => {
             <Button 
               size="lg" 
               variant="secondary"
-              onClick={() => navigate('/signup')}
+              onClick={handleGetStarted}
             >
               <CheckCircle className="h-5 w-5 mr-2" />
               Sign Up Now
@@ -143,7 +165,7 @@ const StartSelling = () => {
               size="lg" 
               variant="outline" 
               className="text-white border-white hover:bg-white hover:text-marketplace-primary"
-              onClick={() => navigate('/subscription-plans')}
+              onClick={() => navigate('/vendor-subscription-plans')}
             >
               View Plans
             </Button>

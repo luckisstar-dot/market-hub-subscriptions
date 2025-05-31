@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Link } from 'react-router-dom';
+import { useUserRole } from '@/contexts/UserRoleContext';
 import { 
   Store, 
   Mail, 
@@ -15,52 +16,64 @@ import {
 } from 'lucide-react';
 
 const Footer = () => {
-  const footerSections = [
-    {
-      title: 'Marketplace',
-      links: [
-        { name: 'Browse Products', href: '/browse-products' },
-        { name: 'Vendor Directory', href: '/vendor-directory' },
-        { name: 'Categories', href: '/categories' },
-        { name: 'New Arrivals', href: '/new-arrivals' },
-        { name: 'Best Sellers', href: '/best-sellers' },
-        { name: 'Special Offers', href: '/special-offers' }
-      ]
-    },
-    {
-      title: 'For Vendors',
-      links: [
-        { name: 'Start Selling', href: '/start-selling' },
-        { name: 'Subscription Plans', href: '/subscription-plans' },
-        { name: 'Vendor Dashboard', href: '/vendor-dashboard' },
-        { name: 'Analytics', href: '#' },
-        { name: 'Support Center', href: '/help-center' },
-        { name: 'Success Stories', href: '#' }
-      ]
-    },
-    {
-      title: 'Support',
-      links: [
-        { name: 'Help Center', href: '/help-center' },
-        { name: 'Contact Us', href: '/contact-us' },
-        { name: 'Shipping Info', href: '#' },
-        { name: 'Returns', href: '#' },
-        { name: 'Payment Methods', href: '#' },
-        { name: 'Security', href: '#' }
-      ]
-    },
-    {
-      title: 'Company',
-      links: [
-        { name: 'About Us', href: '/about-us' },
-        { name: 'Careers', href: '#' },
-        { name: 'Press', href: '#' },
-        { name: 'Blog', href: '#' },
-        { name: 'Investors', href: '#' },
-        { name: 'Partners', href: '#' }
-      ]
+  const { userRole } = useUserRole();
+
+  const getFooterSections = () => {
+    const baseSections = [
+      {
+        title: 'Marketplace',
+        links: [
+          { name: 'Browse Products', href: '/browse-products' },
+          { name: 'Vendor Directory', href: '/vendor-directory' },
+          { name: 'Categories', href: '/categories' },
+          { name: 'New Arrivals', href: '/new-arrivals' },
+          { name: 'Best Sellers', href: '/best-sellers' },
+          { name: 'Special Offers', href: '/special-offers' }
+        ]
+      },
+      {
+        title: 'Support',
+        links: [
+          { name: 'Help Center', href: '/help-center' },
+          { name: 'Contact Us', href: '/contact-us' },
+          { name: 'Shipping Info', href: '/shipping-info' },
+          { name: 'Returns', href: '/returns' },
+          { name: 'Payment Methods', href: '/payment-methods' },
+          { name: 'Security', href: '/security' }
+        ]
+      },
+      {
+        title: 'Company',
+        links: [
+          { name: 'About Us', href: '/about-us' },
+          { name: 'Careers', href: '/careers' },
+          { name: 'Press', href: '/press' },
+          { name: 'Blog', href: '/blog' },
+          { name: 'Investors', href: '#' },
+          { name: 'Partners', href: '#' }
+        ]
+      }
+    ];
+
+    // Only show vendor section if user is a vendor
+    if (userRole === 'vendor') {
+      baseSections.splice(1, 0, {
+        title: 'For Vendors',
+        links: [
+          { name: 'Start Selling', href: '/start-selling' },
+          { name: 'Subscription Plans', href: '/vendor-subscription-plans' },
+          { name: 'Vendor Dashboard', href: '/vendor-dashboard' },
+          { name: 'Analytics', href: '/vendor/analytics' },
+          { name: 'Support Center', href: '/help-center' },
+          { name: 'Success Stories', href: '#' }
+        ]
+      });
     }
-  ];
+
+    return baseSections;
+  };
+
+  const footerSections = getFooterSections();
 
   return (
     <footer className="bg-gray-900 text-white">

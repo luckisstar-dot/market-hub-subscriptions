@@ -20,7 +20,7 @@ export const emailTemplates: EmailTemplate[] = [
     variables: { 
       order_id: '', 
       customer_name: '', 
-      total_amount: 0 
+      total_amount: ''
     },
   },
   {

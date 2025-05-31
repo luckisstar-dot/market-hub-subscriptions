@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, User, Search, Menu, X, Heart, Package, Bell } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole } from '@/contexts/UserRoleContext';
 import { useCart } from '@/contexts/CartContext';
 import NotificationDropdown from './NotificationDropdown';
 
@@ -11,15 +12,27 @@ interface HeaderProps {
   userRole?: 'admin' | 'vendor' | 'buyer';
 }
 
-const Header = ({ userRole }: HeaderProps) => {
+const Header = ({ userRole: propUserRole }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const { userRole: contextUserRole } = useUserRole();
   const { cartCount } = useCart();
   const navigate = useNavigate();
+
+  // Use prop userRole if provided, otherwise use context userRole
+  const userRole = propUserRole || contextUserRole;
 
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
+  };
+
+  const handleStartSelling = () => {
+    if (user && userRole === 'vendor') {
+      navigate('/vendor-dashboard');
+    } else {
+      navigate('/vendor-registration');
+    }
   };
 
   const getDashboardRoute = () => {
@@ -56,9 +69,16 @@ const Header = ({ userRole }: HeaderProps) => {
             <Link to="/categories" className="text-gray-700 hover:text-marketplace-primary transition-colors">
               Categories
             </Link>
-            <Link to="/start-selling" className="text-gray-700 hover:text-marketplace-primary transition-colors">
-              Start Selling
-            </Link>
+            {/* Show Start Selling only if user is not a buyer */}
+            {(!user || userRole !== 'buyer') && (
+              <Button 
+                variant="ghost" 
+                className="text-gray-700 hover:text-marketplace-primary transition-colors p-0 h-auto font-normal"
+                onClick={handleStartSelling}
+              >
+                Start Selling
+              </Button>
+            )}
           </nav>
 
           {/* Right Side Actions */}
@@ -178,13 +198,19 @@ const Header = ({ userRole }: HeaderProps) => {
               >
                 Categories
               </Link>
-              <Link
-                to="/start-selling"
-                className="text-gray-700 hover:text-marketplace-primary transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Start Selling
-              </Link>
+              {/* Show Start Selling only if user is not a buyer */}
+              {(!user || userRole !== 'buyer') && (
+                <Button 
+                  variant="ghost" 
+                  className="text-gray-700 hover:text-marketplace-primary transition-colors justify-start p-0 h-auto font-normal"
+                  onClick={() => {
+                    handleStartSelling();
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  Start Selling
+                </Button>
+              )}
             </nav>
           </div>
         )}

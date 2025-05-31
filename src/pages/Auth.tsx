@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole } from '@/contexts/UserRoleContext';
 import { Loader2, ArrowRight } from 'lucide-react';
 import Header from '@/components/Header';
 
@@ -16,13 +17,26 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   
   const { signIn, user } = useAuth();
+  const { userRole } = useUserRole();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user) {
-      navigate('/');
+    if (user && userRole) {
+      // Redirect based on user role
+      switch (userRole) {
+        case 'vendor':
+          navigate('/vendor-dashboard');
+          break;
+        case 'admin':
+          navigate('/admin-dashboard');
+          break;
+        case 'buyer':
+        default:
+          navigate('/');
+          break;
+      }
     }
-  }, [user, navigate]);
+  }, [user, userRole, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,11 +47,9 @@ const Auth = () => {
     
     if (error) {
       setError(error.message);
-    } else {
-      navigate('/');
+      setLoading(false);
     }
-    
-    setLoading(false);
+    // Note: redirection will be handled by useEffect when user/userRole updates
   };
 
   return (

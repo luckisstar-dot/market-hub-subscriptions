@@ -6,11 +6,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from "@/contexts/AuthContext";
+import { UserRoleProvider } from "@/contexts/UserRoleContext";
 import { CartProvider } from "@/contexts/CartContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import SignUp from "./pages/SignUp";
+import ForgotPassword from "./pages/ForgotPassword";
 import AdminAuth from "./pages/AdminAuth";
 import ProductDetail from "./pages/ProductDetail";
 import Demo from "./pages/Demo";
@@ -28,7 +30,8 @@ import SpecialOffers from "./pages/SpecialOffers";
 // Vendor Pages
 import StartSelling from "./pages/StartSelling";
 import VendorRegistration from "./pages/VendorRegistration";
-import SubscriptionPlans from "./components/SubscriptionPlans";
+import VendorSubscriptionPlans from "./pages/VendorSubscriptionPlans";
+import BuyerSubscriptionPlans from "./pages/BuyerSubscriptionPlans";
 
 // Dashboard Pages
 import VendorDashboard from "./pages/VendorDashboard";
@@ -62,6 +65,15 @@ import ContactUs from "./pages/ContactUs";
 
 // Company Pages
 import AboutUs from "./pages/AboutUs";
+import Careers from "./pages/Careers";
+import Press from "./pages/Press";
+import Blog from "./pages/Blog";
+
+// Additional Pages
+import ShippingInfo from "./pages/ShippingInfo";
+import Returns from "./pages/Returns";
+import PaymentMethods from "./pages/PaymentMethods";
+import Security from "./pages/Security";
 
 const queryClient = new QueryClient();
 
@@ -69,72 +81,85 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <HelmetProvider>
       <AuthProvider>
-        <CartProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/demo" element={<Demo />} />
-                <Route path="/system-status" element={<SystemStatus />} />
-                <Route path="/checkout" element={<Checkout />} />
-                
-                {/* Marketplace Routes */}
-                <Route path="/browse-products" element={<BrowseProducts />} />
-                <Route path="/product/:id" element={<ProductDetail />} />
-                <Route path="/vendor-directory" element={<VendorDirectory />} />
-                <Route path="/vendor-store/:vendorId" element={<VendorStore />} />
-                <Route path="/categories" element={<Categories />} />
-                <Route path="/new-arrivals" element={<NewArrivals />} />
-                <Route path="/best-sellers" element={<BestSellers />} />
-                <Route path="/special-offers" element={<SpecialOffers />} />
-                
-                {/* Vendor Routes */}
-                <Route path="/start-selling" element={<StartSelling />} />
-                <Route path="/vendor-registration" element={<VendorRegistration />} />
-                <Route path="/subscription-plans" element={<SubscriptionPlans />} />
-                
-                {/* Dashboard Routes */}
-                <Route path="/vendor-dashboard" element={<VendorDashboard />} />
-                <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
-                <Route path="/admin-dashboard" element={<AdminDashboard />} />
-                
-                {/* Admin Dashboard Sub-routes */}
-                <Route path="/admin/approve-vendors" element={<ApproveVendors />} />
-                <Route path="/admin/analytics" element={<Analytics />} />
-                <Route path="/admin/system-settings" element={<SystemSettings />} />
-                <Route path="/admin/user-management" element={<UserManagement />} />
-                <Route path="/admin/product-reports" element={<ProductReports />} />
-                <Route path="/admin/test-center" element={<TestCenter />} />
-                
-                {/* Vendor Dashboard Sub-routes */}
-                <Route path="/vendor/add-product" element={<AddProduct />} />
-                <Route path="/vendor/analytics" element={<VendorAnalytics />} />
-                <Route path="/vendor/manage-inventory" element={<ManageInventory />} />
-                <Route path="/vendor/messages" element={<Messages />} />
-                
-                {/* Buyer Dashboard Sub-routes */}
-                <Route path="/buyer/browse-products" element={<BuyerBrowseProducts />} />
-                <Route path="/buyer/view-wishlist" element={<ViewWishlist />} />
-                <Route path="/buyer/track-orders" element={<TrackOrders />} />
-                <Route path="/buyer/write-reviews" element={<WriteReviews />} />
-                
-                {/* Support Routes */}
-                <Route path="/help-center" element={<HelpCenter />} />
-                <Route path="/contact-us" element={<ContactUs />} />
-                
-                {/* Company Routes */}
-                <Route path="/about-us" element={<AboutUs />} />
-                
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
-        </CartProvider>
+        <UserRoleProvider>
+          <CartProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/signup" element={<SignUp />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/demo" element={<Demo />} />
+                  <Route path="/system-status" element={<SystemStatus />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  
+                  {/* Marketplace Routes */}
+                  <Route path="/browse-products" element={<BrowseProducts />} />
+                  <Route path="/product/:id" element={<ProductDetail />} />
+                  <Route path="/vendor-directory" element={<VendorDirectory />} />
+                  <Route path="/vendor-store/:vendorId" element={<VendorStore />} />
+                  <Route path="/categories" element={<Categories />} />
+                  <Route path="/new-arrivals" element={<NewArrivals />} />
+                  <Route path="/best-sellers" element={<BestSellers />} />
+                  <Route path="/special-offers" element={<SpecialOffers />} />
+                  
+                  {/* Vendor Routes */}
+                  <Route path="/start-selling" element={<StartSelling />} />
+                  <Route path="/vendor-registration" element={<VendorRegistration />} />
+                  <Route path="/vendor-subscription-plans" element={<VendorSubscriptionPlans />} />
+                  <Route path="/buyer-subscription-plans" element={<BuyerSubscriptionPlans />} />
+                  
+                  {/* Dashboard Routes */}
+                  <Route path="/vendor-dashboard" element={<VendorDashboard />} />
+                  <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
+                  <Route path="/admin-dashboard" element={<AdminDashboard />} />
+                  
+                  {/* Admin Dashboard Sub-routes */}
+                  <Route path="/admin/approve-vendors" element={<ApproveVendors />} />
+                  <Route path="/admin/analytics" element={<Analytics />} />
+                  <Route path="/admin/system-settings" element={<SystemSettings />} />
+                  <Route path="/admin/user-management" element={<UserManagement />} />
+                  <Route path="/admin/product-reports" element={<ProductReports />} />
+                  <Route path="/admin/test-center" element={<TestCenter />} />
+                  
+                  {/* Vendor Dashboard Sub-routes */}
+                  <Route path="/vendor/add-product" element={<AddProduct />} />
+                  <Route path="/vendor/analytics" element={<VendorAnalytics />} />
+                  <Route path="/vendor/manage-inventory" element={<ManageInventory />} />
+                  <Route path="/vendor/messages" element={<Messages />} />
+                  
+                  {/* Buyer Dashboard Sub-routes */}
+                  <Route path="/buyer/browse-products" element={<BuyerBrowseProducts />} />
+                  <Route path="/buyer/view-wishlist" element={<ViewWishlist />} />
+                  <Route path="/buyer/track-orders" element={<TrackOrders />} />
+                  <Route path="/buyer/write-reviews" element={<WriteReviews />} />
+                  
+                  {/* Support Routes */}
+                  <Route path="/help-center" element={<HelpCenter />} />
+                  <Route path="/contact-us" element={<ContactUs />} />
+                  
+                  {/* Company Routes */}
+                  <Route path="/about-us" element={<AboutUs />} />
+                  <Route path="/careers" element={<Careers />} />
+                  <Route path="/press" element={<Press />} />
+                  <Route path="/blog" element={<Blog />} />
+                  
+                  {/* Additional Routes */}
+                  <Route path="/shipping-info" element={<ShippingInfo />} />
+                  <Route path="/returns" element={<Returns />} />
+                  <Route path="/payment-methods" element={<PaymentMethods />} />
+                  <Route path="/security" element={<Security />} />
+                  
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </TooltipProvider>
+          </CartProvider>
+        </UserRoleProvider>
       </AuthProvider>
     </HelmetProvider>
   </QueryClientProvider>
