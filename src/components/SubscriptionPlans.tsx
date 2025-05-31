@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,11 +12,11 @@ const SubscriptionPlans = () => {
     const isFree = price === '$0';
     
     if (isFree) {
-      // For free plans, go directly to registration
+      // For free plans, go directly to signup
       if (userType === 'buyer') {
-        navigate('/auth?type=buyer&plan=free');
+        navigate('/signup?type=buyer&plan=free');
       } else {
-        navigate('/vendor-registration?plan=free');
+        navigate('/signup?type=vendor&plan=free');
       }
     } else {
       // For paid plans, go to checkout first
@@ -25,7 +24,7 @@ const SubscriptionPlans = () => {
         userType,
         planName,
         price: price.split(' ')[0], // Get just the price part before any dash
-        redirectUrl: userType === 'buyer' ? '/auth?type=buyer' : '/vendor-registration'
+        redirectUrl: userType === 'buyer' ? '/signup?type=buyer' : '/signup?type=vendor'
       };
       
       // Store plan data in sessionStorage for the checkout process

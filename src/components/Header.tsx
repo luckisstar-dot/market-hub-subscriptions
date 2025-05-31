@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -135,7 +136,7 @@ const Header = ({ userRole }: HeaderProps) => {
                   <Link to="/auth">Sign In</Link>
                 </Button>
                 <Button asChild>
-                  <Link to="/auth">Sign Up</Link>
+                  <Link to="/signup">Sign Up</Link>
                 </Button>
               </div>
             )}

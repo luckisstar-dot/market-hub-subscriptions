@@ -68,10 +68,10 @@ const StartSelling = () => {
             size="lg" 
             variant="secondary" 
             className="text-lg px-8 py-4"
-            onClick={() => navigate('/subscription-plans')}
+            onClick={() => navigate('/signup')}
           >
             <Store className="h-5 w-5 mr-2" />
-            Choose Your Plan
+            Get Started
             <ArrowRight className="h-5 w-5 ml-2" />
           </Button>
         </div>
@@ -129,18 +129,23 @@ const StartSelling = () => {
       <section className="py-20 bg-marketplace-primary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Selling?</h2>
-          <p className="text-xl text-blue-100 mb-8">Choose your plan and join our marketplace today</p>
+          <p className="text-xl text-blue-100 mb-8">Join our marketplace today and grow your business</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               size="lg" 
               variant="secondary"
-              onClick={() => navigate('/subscription-plans')}
+              onClick={() => navigate('/signup')}
             >
               <CheckCircle className="h-5 w-5 mr-2" />
-              View Plans & Register
+              Sign Up Now
             </Button>
-            <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-marketplace-primary">
-              Learn More
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="text-white border-white hover:bg-white hover:text-marketplace-primary"
+              onClick={() => navigate('/subscription-plans')}
+            >
+              View Plans
             </Button>
           </div>
         </div>

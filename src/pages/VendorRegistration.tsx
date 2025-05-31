@@ -18,15 +18,12 @@ const VendorRegistration = () => {
     businessName: '',
     description: '',
     location: '',
-    email: '',
-    password: '',
-    fullName: '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   
-  const { signUp, user } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   
@@ -56,31 +53,16 @@ const VendorRegistration = () => {
     setError('');
 
     try {
-      const userData = {
-        full_name: formData.fullName,
-        user_type: 'vendor',
-        business_name: formData.businessName,
-        business_description: formData.description,
-        business_location: formData.location,
-        plan_type: planType || 'free'
-      };
-
-      const { error: signUpError } = await signUp(formData.email, formData.password, userData);
-
-      if (signUpError) {
-        setError(signUpError.message);
-        return;
-      }
-
+      // For this demo, we'll just simulate the vendor profile setup
+      // In a real app, this would update the user's vendor profile in the database
+      
       if (isFreePlan) {
         setSuccess(true);
         setTimeout(() => {
           navigate('/vendor-dashboard');
         }, 2000);
       } else {
-        // For paid plans, proceed to payment
-        // The actual payment processing would happen here
-        // For now, we'll simulate success
+        // For paid plans, proceed to payment confirmation
         setSuccess(true);
         setTimeout(() => {
           navigate('/vendor-dashboard');
@@ -100,10 +82,10 @@ const VendorRegistration = () => {
         <Card className="w-full max-w-md text-center">
           <CardContent className="pt-6">
             <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Registration Successful!</h2>
+            <h2 className="text-2xl font-bold mb-2">Setup Complete!</h2>
             <p className="text-gray-600 mb-4">
               {isFreePlan 
-                ? 'Your free vendor account has been created successfully.'
+                ? 'Your free vendor account has been set up successfully.'
                 : `Your ${selectedPlan?.planName} subscription has been activated.`
               }
             </p>
@@ -125,10 +107,10 @@ const VendorRegistration = () => {
           <div className="text-center mb-8">
             <Badge className="mb-4 bg-marketplace-primary/10 text-marketplace-primary">
               <Store className="h-4 w-4 mr-2" />
-              Vendor Registration
+              Complete Your Vendor Setup
             </Badge>
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              Start Your Selling Journey
+              Tell Us About Your Business
             </h1>
             {selectedPlan && !isFreePlan && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
@@ -137,53 +119,16 @@ const VendorRegistration = () => {
               </div>
             )}
             {isFreePlan && (
-              <p className="text-gray-600">Create your free vendor account to start selling</p>
+              <p className="text-gray-600">Complete your free vendor account setup</p>
             )}
           </div>
 
           <Card>
             <CardHeader>
-              <CardTitle>Vendor Registration Form</CardTitle>
+              <CardTitle>Business Information</CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <Label htmlFor="fullName">Full Name *</Label>
-                    <Input
-                      id="fullName"
-                      name="fullName"
-                      type="text"
-                      value={formData.fullName}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="email">Email Address *</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="password">Password *</Label>
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-
                 <div>
                   <Label htmlFor="businessName">Business Name *</Label>
                   <Input
@@ -229,13 +174,13 @@ const VendorRegistration = () => {
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   {isFreePlan 
-                    ? 'Create Free Vendor Account'
-                    : `Register & Subscribe to ${selectedPlan?.planName || 'Plan'}`
+                    ? 'Complete Free Account Setup'
+                    : `Complete ${selectedPlan?.planName || 'Plan'} Setup`
                   }
                 </Button>
 
                 <p className="text-xs text-gray-500 text-center">
-                  By registering, you agree to our Terms of Service and Privacy Policy.
+                  By completing setup, you agree to our Terms of Service and Privacy Policy.
                 </p>
               </form>
             </CardContent>
