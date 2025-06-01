@@ -61,9 +61,32 @@ const AdminUserRoleManager = () => {
     }
   };
 
+  const sendRoleChangeNotification = async (userId: string, userEmail: string, userName: string, newRole: string, oldRole: string | null) => {
+    try {
+      // Create email notification in database
+      await supabase
+        .from('email_notifications')
+        .insert({
+          user_id: userId,
+          template_name: 'role_change_notification',
+          subject: 'Your Account Role Has Been Updated - OneShop Centrale',
+          content: `Your role has been changed from ${oldRole || 'No Role'} to ${newRole}`,
+          status: 'pending'
+        });
+
+      console.log(`Role change notification queued for ${userEmail}`);
+    } catch (error) {
+      console.error('Error sending role change notification:', error);
+    }
+  };
+
   const updateUserRole = async (userId: string, newRole: 'admin' | 'vendor' | 'buyer') => {
     try {
       setUpdating(userId);
+
+      // Get current role for notification
+      const currentUser = users.find(u => u.id === userId);
+      const oldRole = currentUser?.role;
 
       // Check if user already has a role
       const { data: existingRole } = await supabase
@@ -89,6 +112,17 @@ const AdminUserRoleManager = () => {
         if (error) throw error;
       }
 
+      // Send notification email
+      if (currentUser) {
+        await sendRoleChangeNotification(
+          userId, 
+          currentUser.email, 
+          currentUser.full_name || currentUser.email,
+          newRole, 
+          oldRole
+        );
+      }
+
       // Update local state
       setUsers(prev => prev.map(user => 
         user.id === userId ? { ...user, role: newRole } : user
@@ -96,7 +130,7 @@ const AdminUserRoleManager = () => {
 
       toast({
         title: 'Success',
-        description: 'User role updated successfully',
+        description: 'User role updated successfully and notification sent',
       });
     } catch (error) {
       console.error('Error updating user role:', error);

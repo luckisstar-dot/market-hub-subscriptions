@@ -30,6 +30,7 @@ import SpecialOffers from "./pages/SpecialOffers";
 // Vendor Pages
 import StartSelling from "./pages/StartSelling";
 import VendorRegistration from "./pages/VendorRegistration";
+import VendorOnboarding from "./pages/VendorOnboarding";
 import VendorSubscriptionPlans from "./pages/VendorSubscriptionPlans";
 import BuyerSubscriptionPlans from "./pages/BuyerSubscriptionPlans";
 
@@ -45,6 +46,7 @@ import SystemSettings from "./pages/admin/SystemSettings";
 import UserManagement from "./pages/admin/UserManagement";
 import ProductReports from "./pages/admin/ProductReports";
 import TestCenter from "./pages/admin/TestCenter";
+import ContentManagement from "./pages/admin/ContentManagement";
 
 // Vendor Dashboard Pages
 import AddProduct from "./pages/vendor/AddProduct";
@@ -74,6 +76,7 @@ import ShippingInfo from "./pages/ShippingInfo";
 import Returns from "./pages/Returns";
 import PaymentMethods from "./pages/PaymentMethods";
 import Security from "./pages/Security";
+import UserProfile from "./pages/UserProfile";
 
 const queryClient = new QueryClient();
 
@@ -95,6 +98,7 @@ const App = () => (
                   <Route path="/demo" element={<Demo />} />
                   <Route path="/system-status" element={<SystemStatus />} />
                   <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/profile" element={<UserProfile />} />
                   
                   {/* Marketplace Routes */}
                   <Route path="/browse-products" element={<BrowseProducts />} />
@@ -109,6 +113,7 @@ const App = () => (
                   {/* Vendor Routes */}
                   <Route path="/start-selling" element={<StartSelling />} />
                   <Route path="/vendor-registration" element={<VendorRegistration />} />
+                  <Route path="/vendor-onboarding" element={<VendorOnboarding />} />
                   <Route path="/vendor-subscription-plans" element={<VendorSubscriptionPlans />} />
                   <Route path="/buyer-subscription-plans" element={<BuyerSubscriptionPlans />} />
                   
@@ -124,6 +129,7 @@ const App = () => (
                   <Route path="/admin/user-management" element={<UserManagement />} />
                   <Route path="/admin/product-reports" element={<ProductReports />} />
                   <Route path="/admin/test-center" element={<TestCenter />} />
+                  <Route path="/admin/content-management" element={<ContentManagement />} />
                   
                   {/* Vendor Dashboard Sub-routes */}
                   <Route path="/vendor/add-product" element={<AddProduct />} />
