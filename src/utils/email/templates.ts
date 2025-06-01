@@ -20,7 +20,7 @@ export const emailTemplates: EmailTemplate[] = [
     variables: { 
       order_id: '', 
       customer_name: '', 
-      total_amount: ''
+      total_amount: 0
     },
   },
   {
@@ -61,6 +61,22 @@ export const emailTemplates: EmailTemplate[] = [
     variables: { 
       user_name: '', 
       reset_url: '' 
+    },
+  },
+  {
+    name: 'role_change_notification',
+    subject: 'Your Account Role Has Been Updated - OneShop Centrale',
+    html_content: `
+      <h1>Account Role Update</h1>
+      <p>Dear {{user_name}},</p>
+      <p>Your account role has been updated to: <strong>{{new_role}}</strong></p>
+      <p>This change was made on {{change_date}}.</p>
+      <p>If you have any questions about this change, please contact our support team.</p>
+    `,
+    variables: { 
+      user_name: '', 
+      new_role: '',
+      change_date: ''
     },
   },
 ];

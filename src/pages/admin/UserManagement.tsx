@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Eye, Ban, UserCheck, Search } from 'lucide-react';
 import Header from '@/components/Header';
+import AdminUserRoleManager from '@/components/AdminUserRoleManager';
 
 const UserManagement = () => {
   const users = [
@@ -61,6 +62,11 @@ const UserManagement = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">User Management</h1>
           <p className="text-gray-600">Manage platform users and their permissions.</p>
+        </div>
+
+        {/* User Role Management Component */}
+        <div className="mb-8">
+          <AdminUserRoleManager />
         </div>
 
         <Card className="mb-6">
