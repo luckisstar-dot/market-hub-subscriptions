@@ -1,18 +1,26 @@
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserRole } from '@/contexts/UserRoleContext';
-import { supabase } from '@/integrations/supabase/client';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Loader2, User, Settings, Bell, CreditCard } from 'lucide-react';
 import Header from '@/components/Header';
-import { User, Mail, Phone, MapPin, Calendar, Edit, Save, X } from 'lucide-react';
+import MetaTags from '@/components/SEO/MetaTags';
+import FileUpload from '@/components/FileUpload';
+
+interface Address {
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+}
 
 interface UserProfile {
   id: string;
@@ -20,21 +28,18 @@ interface UserProfile {
   full_name: string | null;
   avatar_url: string | null;
   phone: string | null;
-  address: any;
+  address: Address | null;
   user_type: string;
   plan_type: string;
-  created_at: string;
+  plan_status: string;
 }
 
 const UserProfile = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const { user } = useAuth();
-  const { userRole } = useUserRole();
-  const { toast } = useToast();
-
   const [formData, setFormData] = useState({
     full_name: '',
     phone: '',
@@ -54,13 +59,11 @@ const UserProfile = () => {
   }, [user]);
 
   const fetchProfile = async () => {
-    if (!user) return;
-
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user.id)
+        .eq('id', user?.id)
         .single();
 
       if (error) throw error;
@@ -69,13 +72,9 @@ const UserProfile = () => {
       setFormData({
         full_name: data.full_name || '',
         phone: data.phone || '',
-        address: data.address || {
-          street: '',
-          city: '',
-          state: '',
-          zipCode: '',
-          country: ''
-        }
+        address: typeof data.address === 'object' && data.address !== null 
+          ? data.address as Address
+          : { street: '', city: '', state: '', zipCode: '', country: '' }
       });
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -90,29 +89,27 @@ const UserProfile = () => {
   };
 
   const handleSave = async () => {
-    if (!user) return;
-
-    setSaving(true);
     try {
+      setSaving(true);
+      
       const { error } = await supabase
         .from('profiles')
         .update({
           full_name: formData.full_name,
           phone: formData.phone,
           address: formData.address,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
-        .eq('id', user.id);
+        .eq('id', user?.id);
 
       if (error) throw error;
 
-      await fetchProfile();
-      setIsEditing(false);
-      
       toast({
         title: 'Success',
         description: 'Profile updated successfully',
       });
+
+      fetchProfile();
     } catch (error) {
       console.error('Error updating profile:', error);
       toast({
@@ -125,32 +122,39 @@ const UserProfile = () => {
     }
   };
 
-  const handleCancel = () => {
-    if (profile) {
-      setFormData({
-        full_name: profile.full_name || '',
-        phone: profile.phone || '',
-        address: profile.address || {
-          street: '',
-          city: '',
-          state: '',
-          zipCode: '',
-          country: ''
-        }
-      });
+  const handleAvatarUpload = async (urls: string[]) => {
+    if (urls.length > 0) {
+      try {
+        const { error } = await supabase
+          .from('profiles')
+          .update({ avatar_url: urls[0] })
+          .eq('id', user?.id);
+
+        if (error) throw error;
+
+        toast({
+          title: 'Success',
+          description: 'Avatar updated successfully',
+        });
+
+        fetchProfile();
+      } catch (error) {
+        console.error('Error updating avatar:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to update avatar',
+          variant: 'destructive',
+        });
+      }
     }
-    setIsEditing(false);
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header userRole={userRole} />
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-            <div className="h-64 bg-gray-200 rounded"></div>
-          </div>
+        <Header userRole={profile?.user_type as any} />
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="h-8 w-8 animate-spin" />
         </div>
       </div>
     );
@@ -159,185 +163,207 @@ const UserProfile = () => {
   if (!profile) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header userRole={userRole} />
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900">Profile not found</h1>
-          </div>
+        <Header userRole="buyer" />
+        <div className="max-w-4xl mx-auto px-4 py-16">
+          <p className="text-center text-gray-600">Profile not found</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header userRole={userRole} />
-      
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">User Profile</h1>
-          <p className="text-gray-600">Manage your account settings and personal information.</p>
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Profile Overview */}
-          <div className="lg:col-span-1">
-            <Card>
-              <CardHeader className="text-center">
-                <Avatar className="w-24 h-24 mx-auto mb-4">
-                  <AvatarImage src={profile.avatar_url || ''} />
-                  <AvatarFallback>
-                    <User className="w-12 h-12" />
-                  </AvatarFallback>
-                </Avatar>
-                <CardTitle>{profile.full_name || profile.email}</CardTitle>
-                <div className="flex justify-center gap-2 mt-2">
-                  <Badge variant="outline">{userRole}</Badge>
-                  <Badge variant="secondary">{profile.plan_type}</Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Mail className="w-4 h-4 mr-2" />
-                    {profile.email}
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    Joined {new Date(profile.created_at).toLocaleDateString()}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+    <>
+      <MetaTags
+        title="My Profile"
+        description="Manage your account settings and preferences"
+      />
+      <div className="min-h-screen bg-gray-50">
+        <Header userRole={profile.user_type as any} />
+        
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">My Profile</h1>
+            <p className="text-gray-600">Manage your account settings and preferences</p>
           </div>
 
-          {/* Profile Details */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Personal Information</CardTitle>
-                <div className="flex gap-2">
-                  {isEditing ? (
-                    <>
-                      <Button variant="outline" size="sm" onClick={handleCancel}>
-                        <X className="w-4 h-4 mr-2" />
-                        Cancel
-                      </Button>
-                      <Button size="sm" onClick={handleSave} disabled={saving}>
-                        <Save className="w-4 h-4 mr-2" />
-                        {saving ? 'Saving...' : 'Save'}
-                      </Button>
-                    </>
-                  ) : (
-                    <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
-                      <Edit className="w-4 h-4 mr-2" />
-                      Edit
-                    </Button>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="full_name">Full Name</Label>
-                    {isEditing ? (
+          <Tabs defaultValue="profile" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="profile" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Profile
+              </TabsTrigger>
+              <TabsTrigger value="account" className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                Account
+              </TabsTrigger>
+              <TabsTrigger value="notifications" className="flex items-center gap-2">
+                <Bell className="h-4 w-4" />
+                Notifications
+              </TabsTrigger>
+              <TabsTrigger value="billing" className="flex items-center gap-2">
+                <CreditCard className="h-4 w-4" />
+                Billing
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="profile">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Profile Information</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="flex items-center space-x-4">
+                    <Avatar className="h-20 w-20">
+                      <AvatarImage src={profile.avatar_url || ''} />
+                      <AvatarFallback>
+                        {profile.full_name?.charAt(0) || profile.email.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <FileUpload
+                        onUpload={handleAvatarUpload}
+                        maxFiles={1}
+                        existingImages={profile.avatar_url ? [profile.avatar_url] : []}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Full Name</label>
                       <Input
-                        id="full_name"
                         value={formData.full_name}
                         onChange={(e) => setFormData(prev => ({ ...prev, full_name: e.target.value }))}
+                        placeholder="Enter your full name"
                       />
-                    ) : (
-                      <p className="text-sm text-gray-600 mt-1">{formData.full_name || 'Not provided'}</p>
-                    )}
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="email">Email</Label>
-                    <p className="text-sm text-gray-600 mt-1">{profile.email}</p>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="phone">Phone</Label>
-                    {isEditing ? (
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Phone</label>
                       <Input
-                        id="phone"
                         value={formData.phone}
                         onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                        placeholder="Enter your phone number"
                       />
-                    ) : (
-                      <p className="text-sm text-gray-600 mt-1">{formData.phone || 'Not provided'}</p>
-                    )}
+                    </div>
                   </div>
-                </div>
 
-                <div>
-                  <Label>Address</Label>
-                  {isEditing ? (
-                    <div className="grid md:grid-cols-2 gap-4 mt-2">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Address</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <Input
-                        placeholder="Street"
                         value={formData.address.street}
                         onChange={(e) => setFormData(prev => ({ 
                           ...prev, 
                           address: { ...prev.address, street: e.target.value }
                         }))}
+                        placeholder="Street address"
                       />
                       <Input
-                        placeholder="City"
                         value={formData.address.city}
                         onChange={(e) => setFormData(prev => ({ 
                           ...prev, 
                           address: { ...prev.address, city: e.target.value }
                         }))}
+                        placeholder="City"
                       />
                       <Input
-                        placeholder="State"
                         value={formData.address.state}
                         onChange={(e) => setFormData(prev => ({ 
                           ...prev, 
                           address: { ...prev.address, state: e.target.value }
                         }))}
+                        placeholder="State"
                       />
                       <Input
-                        placeholder="ZIP Code"
                         value={formData.address.zipCode}
                         onChange={(e) => setFormData(prev => ({ 
                           ...prev, 
                           address: { ...prev.address, zipCode: e.target.value }
                         }))}
-                      />
-                      <Input
-                        placeholder="Country"
-                        value={formData.address.country}
-                        onChange={(e) => setFormData(prev => ({ 
-                          ...prev, 
-                          address: { ...prev.address, country: e.target.value }
-                        }))}
+                        placeholder="ZIP Code"
                       />
                     </div>
-                  ) : (
-                    <div className="text-sm text-gray-600 mt-1">
-                      {formData.address.street || formData.address.city ? (
-                        <div>
-                          {formData.address.street && <div>{formData.address.street}</div>}
-                          <div>
-                            {[formData.address.city, formData.address.state, formData.address.zipCode]
-                              .filter(Boolean).join(', ')}
-                          </div>
-                          {formData.address.country && <div>{formData.address.country}</div>}
-                        </div>
-                      ) : (
-                        'Not provided'
-                      )}
+                    <Input
+                      className="mt-4"
+                      value={formData.address.country}
+                      onChange={(e) => setFormData(prev => ({ 
+                        ...prev, 
+                        address: { ...prev.address, country: e.target.value }
+                      }))}
+                      placeholder="Country"
+                    />
+                  </div>
+
+                  <Button onClick={handleSave} disabled={saving}>
+                    {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                    Save Changes
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="account">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Account Settings</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="font-medium">Email</p>
+                      <p className="text-gray-600">{profile.email}</p>
                     </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                    <Button variant="outline" size="sm">Change Email</Button>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="font-medium">Account Type</p>
+                      <Badge variant="secondary">{profile.user_type}</Badge>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="font-medium">Current Plan</p>
+                      <div className="flex items-center gap-2">
+                        <Badge>{profile.plan_type}</Badge>
+                        <Badge variant={profile.plan_status === 'active' ? 'default' : 'destructive'}>
+                          {profile.plan_status}
+                        </Badge>
+                      </div>
+                    </div>
+                    <Button variant="outline" size="sm">Upgrade Plan</Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="notifications">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Notification Preferences</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600">Notification settings will be available soon.</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="billing">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Billing Information</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600">Billing management will be available soon.</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
