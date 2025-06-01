@@ -153,6 +153,19 @@ class TestExpectation {
     }
   }
 
+  not = {
+    toContain: (expected: any): void => {
+      if (this.actual.includes(expected)) {
+        throw new Error(`Expected ${this.actual} not to contain ${expected}`);
+      }
+    },
+    toBe: (expected: any): void => {
+      if (this.actual === expected) {
+        throw new Error(`Expected ${this.actual} not to be ${expected}`);
+      }
+    }
+  };
+
   toThrow(): void {
     if (typeof this.actual !== 'function') {
       throw new Error('Expected a function');
@@ -180,4 +193,4 @@ class TestExpectation {
 }
 
 export const testRunner = new TestRunner();
-export { TestRunner, TestResult, TestSuite };
+export type { TestRunner, TestResult, TestSuite };

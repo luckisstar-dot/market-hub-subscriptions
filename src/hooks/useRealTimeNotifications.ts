@@ -92,8 +92,14 @@ export const useRealTimeNotifications = () => {
 
       if (error) throw error;
 
-      setNotifications(data || []);
-      setUnreadCount((data || []).filter(n => !n.read).length);
+      // Type cast to ensure proper typing
+      const typedData = (data || []).map(item => ({
+        ...item,
+        type: item.type as 'info' | 'success' | 'warning' | 'error'
+      })) as RealTimeNotification[];
+
+      setNotifications(typedData);
+      setUnreadCount(typedData.filter(n => !n.read).length);
     } catch (error) {
       console.error('Error fetching notifications:', error);
     }
