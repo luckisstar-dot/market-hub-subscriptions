@@ -33,6 +33,7 @@ import VendorRegistration from "./pages/VendorRegistration";
 import VendorOnboarding from "./pages/VendorOnboarding";
 import VendorSubscriptionPlans from "./pages/VendorSubscriptionPlans";
 import BuyerSubscriptionPlans from "./pages/BuyerSubscriptionPlans";
+import SubscriptionPlans from "./pages/SubscriptionPlans";
 
 // Dashboard Pages
 import VendorDashboard from "./pages/VendorDashboard";
@@ -110,12 +111,15 @@ const App = () => (
                   <Route path="/best-sellers" element={<BestSellers />} />
                   <Route path="/special-offers" element={<SpecialOffers />} />
                   
+                  {/* Subscription Plans Routes */}
+                  <Route path="/subscription-plans" element={<SubscriptionPlans />} />
+                  <Route path="/vendor-subscription-plans" element={<VendorSubscriptionPlans />} />
+                  <Route path="/buyer-subscription-plans" element={<BuyerSubscriptionPlans />} />
+                  
                   {/* Vendor Routes */}
                   <Route path="/start-selling" element={<StartSelling />} />
                   <Route path="/vendor-registration" element={<VendorRegistration />} />
                   <Route path="/vendor-onboarding" element={<VendorOnboarding />} />
-                  <Route path="/vendor-subscription-plans" element={<VendorSubscriptionPlans />} />
-                  <Route path="/buyer-subscription-plans" element={<BuyerSubscriptionPlans />} />
                   
                   {/* Dashboard Routes */}
                   <Route path="/vendor-dashboard" element={<VendorDashboard />} />

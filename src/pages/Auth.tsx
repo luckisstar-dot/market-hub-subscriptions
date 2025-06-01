@@ -22,9 +22,12 @@ const Auth = () => {
 
   useEffect(() => {
     if (user && userRole) {
-      // Redirect based on user role
+      // Redirect based on user role and check if onboarding is needed
       switch (userRole) {
         case 'vendor':
+          // Check if vendor onboarding is completed
+          // In a real app, you'd check this from the database
+          // For now, redirect to vendor dashboard
           navigate('/vendor-dashboard');
           break;
         case 'admin':
@@ -112,17 +115,27 @@ const Auth = () => {
                 </div>
               </div>
               
-              <Button 
-                variant="outline" 
-                className="w-full" 
-                onClick={() => navigate('/signup')}
-              >
-                Create Account
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              <div className="space-y-2">
+                <Button 
+                  variant="outline" 
+                  className="w-full" 
+                  onClick={() => navigate('/subscription-plans')}
+                >
+                  Choose Your Plan & Sign Up
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+                
+                <Button 
+                  variant="ghost" 
+                  className="w-full text-sm" 
+                  onClick={() => navigate('/signup')}
+                >
+                  Quick Sign Up (Free Plan)
+                </Button>
+              </div>
               
               <p className="text-xs text-gray-500">
-                Don't have an account yet? Sign up to access our marketplace
+                New users should select a subscription plan to get started
               </p>
             </div>
             

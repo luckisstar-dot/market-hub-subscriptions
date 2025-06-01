@@ -96,10 +96,25 @@ const SubscriptionPlans = () => {
   ];
 
   const handleSelectPlan = (planId: string, userType: string = 'vendor') => {
+    // Store plan information for later use
+    const selectedPlan = plans.find(plan => plan.id === planId);
+    if (selectedPlan) {
+      const planData = {
+        planId: selectedPlan.id,
+        planName: selectedPlan.name,
+        price: selectedPlan.price,
+        billing: selectedPlan.billing,
+        userType
+      };
+      
+      // Store in sessionStorage for use in signup and onboarding
+      sessionStorage.setItem('selectedPlan', JSON.stringify(planData));
+    }
+
     if (planId === 'free') {
       navigate(`/signup?type=${userType}&plan=free`);
     } else {
-      // For paid plans, redirect to signup first, then to payment
+      // For paid plans, redirect to signup with plan info
       navigate(`/signup?type=${userType}&plan=${planId}`);
     }
   };

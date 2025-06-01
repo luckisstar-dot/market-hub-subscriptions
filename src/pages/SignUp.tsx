@@ -21,43 +21,63 @@ const SignUp = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   
-  const userType = searchParams.get('type'); // 'buyer' or null
-  const planType = searchParams.get('plan'); // 'free' or null
+  const userType = searchParams.get('type'); // 'buyer' or 'vendor'
+  const planType = searchParams.get('plan'); // 'free' or plan id
   const isFreePlan = planType === 'free';
 
   useEffect(() => {
     if (user) {
-      navigate('/');
+      // Check user type and redirect accordingly
+      if (userType === 'vendor') {
+        navigate('/vendor-onboarding?plan=' + planType);
+      } else {
+        navigate('/');
+      }
     }
-  }, [user, navigate]);
+  }, [user, navigate, userType, planType]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     
+    // Get plan data from session storage if available
+    const storedPlan = sessionStorage.getItem('selectedPlan');
+    const planData = storedPlan ? JSON.parse(storedPlan) : null;
+    
     const userData = {
       full_name: fullName,
       user_type: userType || 'buyer',
-      plan_type: planType || 'free'
+      plan_type: planType || 'free',
+      plan_name: planData?.planName || 'Free',
+      plan_price: planData?.price || 0
     };
     
     const { error } = await signUp(email, password, userData);
     
     if (error) {
       setError(error.message);
+      setLoading(false);
     } else {
       setError('');
+      // Success message and redirection will be handled by useEffect
       alert('Account created successfully! Check your email for a confirmation link.');
-      navigate('/');
     }
-    
-    setLoading(false);
   };
 
   const handleGoToPlans = () => {
     navigate('/subscription-plans');
   };
+
+  const getSelectedPlanInfo = () => {
+    const storedPlan = sessionStorage.getItem('selectedPlan');
+    if (storedPlan) {
+      return JSON.parse(storedPlan);
+    }
+    return null;
+  };
+
+  const selectedPlan = getSelectedPlanInfo();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -78,7 +98,13 @@ const SignUp = () => {
               <CardTitle className="text-center text-2xl font-bold">
                 Create Your Account
               </CardTitle>
-              {isFreePlan && (
+              {selectedPlan && (
+                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                  <p className="text-sm font-medium text-blue-900">Selected Plan: {selectedPlan.planName}</p>
+                  <p className="text-sm text-blue-700">${selectedPlan.price}/{selectedPlan.billing}</p>
+                </div>
+              )}
+              {isFreePlan && !selectedPlan && (
                 <p className="text-sm text-gray-600 mt-2">
                   Creating your free {userType || 'buyer'} account
                 </p>
@@ -144,7 +170,7 @@ const SignUp = () => {
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {isFreePlan ? `Create Free ${userType || 'Buyer'} Account` : 'Create Account'}
+                  {userType === 'vendor' ? 'Create Vendor Account' : 'Create Buyer Account'}
                 </Button>
                 
                 <div className="text-center">

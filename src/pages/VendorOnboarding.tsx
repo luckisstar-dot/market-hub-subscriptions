@@ -18,7 +18,7 @@ const steps = [
   { id: 1, title: 'Business Information', description: 'Tell us about your business' },
   { id: 2, title: 'Contact Details', description: 'How customers can reach you' },
   { id: 3, title: 'Business Verification', description: 'Verify your business documents' },
-  { id: 4, title: 'Plan Selection', description: 'Choose your subscription plan' },
+  { id: 4, title: 'Plan Confirmation', description: 'Confirm your subscription plan' },
   { id: 5, title: 'Review & Complete', description: 'Review and complete setup' }
 ];
 
@@ -56,13 +56,26 @@ const VendorOnboarding = () => {
   });
 
   useEffect(() => {
-    if (user) {
-      // Check if user is already a vendor
-      navigate('/vendor-dashboard');
+    // If user is not authenticated, redirect to signup
+    if (!user) {
+      navigate('/signup?type=vendor&plan=' + planType);
+      return;
     }
-  }, [user, navigate]);
 
-  const selectedPlan = !isFreePlan ? JSON.parse(sessionStorage.getItem('selectedPlan') || '{}') : null;
+    // Check if user is already a vendor with completed onboarding
+    // In a real app, you'd check this from the database
+    // For now, we'll allow the onboarding process
+  }, [user, navigate, planType]);
+
+  const getSelectedPlanData = () => {
+    const storedPlan = sessionStorage.getItem('selectedPlan');
+    if (storedPlan) {
+      return JSON.parse(storedPlan);
+    }
+    return null;
+  };
+
+  const selectedPlanData = getSelectedPlanData();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -108,10 +121,26 @@ const VendorOnboarding = () => {
     setError('');
 
     try {
-      // Simulate vendor profile setup
-      // In a real app, this would create vendor profile in database
+      // Here you would:
+      // 1. Create vendor profile in database
+      // 2. Set up subscription if paid plan
+      // 3. Send welcome email
+      // 4. Update user role to vendor
       
+      console.log('Creating vendor profile with data:', {
+        ...formData,
+        userId: user?.id,
+        planData: selectedPlanData
+      });
+
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
       setSuccess(true);
+      
+      // Clear stored plan data
+      sessionStorage.removeItem('selectedPlan');
+      
       setTimeout(() => {
         navigate('/vendor-dashboard');
       }, 2000);
@@ -261,30 +290,43 @@ const VendorOnboarding = () => {
         return (
           <div className="space-y-4">
             <div className="text-center mb-6">
-              <h3 className="text-lg font-semibold mb-2">Plan Selection</h3>
-              <p className="text-gray-600">Choose the plan that best fits your business needs</p>
+              <h3 className="text-lg font-semibold mb-2">Plan Confirmation</h3>
+              <p className="text-gray-600">Confirm your selected subscription plan</p>
             </div>
             
-            {selectedPlan && !isFreePlan ? (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 className="font-semibold text-blue-900">Selected Plan: {selectedPlan.planName}</h4>
-                <p className="text-blue-700">Price: {selectedPlan.price}/month</p>
-                <p className="text-sm text-blue-600 mt-2">{selectedPlan.description}</p>
+            {selectedPlanData && !isFreePlan ? (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <div className="text-center">
+                  <h4 className="text-xl font-bold text-blue-900 mb-2">{selectedPlanData.planName}</h4>
+                  <div className="text-3xl font-bold text-blue-700 mb-2">
+                    ${selectedPlanData.price}
+                    <span className="text-lg font-normal">/{selectedPlanData.billing}</span>
+                  </div>
+                  <p className="text-blue-600 mb-4">Perfect for growing your business</p>
+                  
+                  <div className="bg-white rounded-lg p-4 mb-4">
+                    <p className="text-sm text-gray-600 mb-2">Payment will be processed after account setup</p>
+                    <p className="text-xs text-gray-500">You can cancel anytime</p>
+                  </div>
+                </div>
               </div>
             ) : (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <h4 className="font-semibold text-green-900">Free Plan Selected</h4>
-                <p className="text-green-700">Perfect for getting started</p>
-                <ul className="text-sm text-green-600 mt-2 list-disc list-inside">
-                  <li>Up to 10 products</li>
-                  <li>Basic analytics</li>
-                  <li>Standard support</li>
-                </ul>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+                <div className="text-center">
+                  <h4 className="text-xl font-bold text-green-900 mb-2">Free Plan</h4>
+                  <p className="text-green-700 mb-4">Perfect for getting started</p>
+                  <ul className="text-sm text-green-600 space-y-1">
+                    <li>✓ Up to 10 products</li>
+                    <li>✓ Basic analytics</li>
+                    <li>✓ Standard support</li>
+                    <li>✓ 5% commission rate</li>
+                  </ul>
+                </div>
               </div>
             )}
             
             <div className="text-center">
-              <Button variant="outline" onClick={() => navigate('/vendor-subscription-plans')}>
+              <Button variant="outline" onClick={() => navigate('/subscription-plans')}>
                 Change Plan
               </Button>
             </div>
@@ -322,7 +364,12 @@ const VendorOnboarding = () => {
               <div className="border rounded-lg p-4">
                 <h4 className="font-medium mb-2">Selected Plan</h4>
                 <div className="text-sm text-gray-600">
-                  <p>{isFreePlan ? 'Free Plan' : selectedPlan?.planName || 'Free Plan'}</p>
+                  <p>{selectedPlanData?.planName || 'Free Plan'}</p>
+                  {selectedPlanData && (
+                    <p className="text-marketplace-primary font-medium">
+                      ${selectedPlanData.price}/{selectedPlanData.billing}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -344,6 +391,11 @@ const VendorOnboarding = () => {
             <p className="text-gray-600 mb-4">
               Your vendor account has been set up successfully.
             </p>
+            {selectedPlanData && !isFreePlan && (
+              <p className="text-sm text-blue-600 mb-4">
+                Your {selectedPlanData.planName} subscription will be activated shortly.
+              </p>
+            )}
             <p className="text-sm text-gray-500">
               Redirecting to your dashboard...
             </p>

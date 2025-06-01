@@ -79,6 +79,23 @@ export const emailTemplates: EmailTemplate[] = [
       change_date: ''
     },
   },
+  {
+    name: 'welcome_email',
+    subject: 'Welcome to OneShop Centrale - {{user_name}}',
+    html_content: `
+      <h1>Welcome to OneShop Centrale!</h1>
+      <p>Dear {{user_name}},</p>
+      <p>Thank you for joining OneShop Centrale! Your {{user_type}} account has been created successfully.</p>
+      <p>You're currently on the {{plan_name}} plan.</p>
+      <p>Get started by exploring our platform and discovering what OneShop Centrale has to offer.</p>
+      <p>If you have any questions, feel free to contact our support team.</p>
+    `,
+    variables: { 
+      user_name: '', 
+      user_type: '',
+      plan_name: ''
+    },
+  },
 ];
 
 export const getTemplate = (name: string): EmailTemplate | undefined => {
