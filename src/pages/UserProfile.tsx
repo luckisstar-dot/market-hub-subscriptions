@@ -89,7 +89,7 @@ const UserProfile = () => {
     }
   };
 
-  const updateProfile = async (updates: Partial<Omit<UserProfile, 'address'>> & { address?: Record<string, any> }) => {
+  const updateProfile = async (updates: Partial<Omit<UserProfile, 'address'>> & { address?: Address }) => {
     setUpdating(true);
     try {
       const { error } = await supabase
@@ -100,12 +100,7 @@ const UserProfile = () => {
       if (error) throw error;
 
       // Update local state with proper type conversion
-      if (updates.address) {
-        const addressUpdate = updates.address as Address;
-        setProfile(prev => prev ? { ...prev, ...updates, address: addressUpdate } : null);
-      } else {
-        setProfile(prev => prev ? { ...prev, ...updates } : null);
-      }
+      setProfile(prev => prev ? { ...prev, ...updates } : null);
 
       toast({
         title: 'Success',
