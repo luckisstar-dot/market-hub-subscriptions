@@ -2,7 +2,8 @@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Store, Users, Shield, Star, TrendingUp, ShoppingCart } from 'lucide-react';
+import { Store, Users, ShoppingCart, Star } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const HeroSection = () => {
   const stats = [
@@ -42,17 +43,17 @@ const HeroSection = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-            <Button size="lg" className="bg-marketplace-primary hover:bg-marketplace-primary-dark text-white px-8 py-3">
-              <Store className="mr-2 h-5 w-5" />
-              Start Selling
+            <Button size="lg" className="bg-marketplace-primary hover:bg-marketplace-primary-dark text-white px-8 py-3" asChild>
+              <Link to="/vendor-subscription-plans">
+                <Store className="mr-2 h-5 w-5" />
+                Start Selling
+              </Link>
             </Button>
-            <Button size="lg" variant="outline" className="px-8 py-3">
-              <ShoppingCart className="mr-2 h-5 w-5" />
-              Shop Now
-            </Button>
-            <Button size="lg" variant="secondary" className="px-8 py-3">
-              <Shield className="mr-2 h-5 w-5" />
-              Admin Demo
+            <Button size="lg" variant="outline" className="px-8 py-3" asChild>
+              <Link to="/browse-products">
+                <ShoppingCart className="mr-2 h-5 w-5" />
+                Shop Now
+              </Link>
             </Button>
           </div>
 
