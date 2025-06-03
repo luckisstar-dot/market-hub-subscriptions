@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -60,13 +59,19 @@ const UserProfile = () => {
 
       if (error) throw error;
 
-      // Parse address and ensure proper typing
-      const address = data.address ? 
-        (typeof data.address === 'object' && data.address !== null ? 
-          data.address as Address : 
-          { street: '', city: '', state: '', zipCode: '', country: '' }
-        ) : 
-        { street: '', city: '', state: '', zipCode: '', country: '' };
+      // Safely parse address with proper type checking
+      let address: Address = { street: '', city: '', state: '', zipCode: '', country: '' };
+      
+      if (data.address && typeof data.address === 'object' && !Array.isArray(data.address)) {
+        const addressData = data.address as Record<string, any>;
+        address = {
+          street: addressData.street || '',
+          city: addressData.city || '',
+          state: addressData.state || '',
+          zipCode: addressData.zipCode || '',
+          country: addressData.country || ''
+        };
+      }
 
       setProfile({
         ...data,
@@ -84,7 +89,7 @@ const UserProfile = () => {
     }
   };
 
-  const updateProfile = async (updates: Partial<UserProfile>) => {
+  const updateProfile = async (updates: Partial<Omit<UserProfile, 'address'>> & { address?: Record<string, any> }) => {
     setUpdating(true);
     try {
       const { error } = await supabase
@@ -94,7 +99,14 @@ const UserProfile = () => {
 
       if (error) throw error;
 
-      setProfile(prev => prev ? { ...prev, ...updates } : null);
+      // Update local state with proper type conversion
+      if (updates.address) {
+        const addressUpdate = updates.address as Address;
+        setProfile(prev => prev ? { ...prev, ...updates, address: addressUpdate } : null);
+      } else {
+        setProfile(prev => prev ? { ...prev, ...updates } : null);
+      }
+
       toast({
         title: 'Success',
         description: 'Profile updated successfully',
